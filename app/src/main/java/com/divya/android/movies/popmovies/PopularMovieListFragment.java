@@ -30,17 +30,18 @@ import java.net.URL;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment {
+public class PopularMovieListFragment extends Fragment {
 
-    private  ImageAdapter mImageAdapter;
+    //gridView holds the id defined in fragment_main.xml
     private GridView gridView;
 
-    public MainActivityFragment() {
+    public PopularMovieListFragment() {
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        //Updates the popular Movies list
         updateMoviesList();
     }
 
@@ -49,28 +50,34 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        updateMoviesList();
+        //updateMoviesList();
+        //Obtain the gridView ID . where rootView inflates the fragment_main.xml
         gridView = (GridView)rootView.findViewById(R.id.gridview);
+
 
         return rootView;
     }
 
     private void updateMoviesList() {
+        //This creates an AsyncTask FetchMovieTask() which runs in other thread than main thread.
         FetchMovieTask movieTask = new FetchMovieTask();
+
         movieTask.execute();
     }
 
     public class ImageAdapter extends BaseAdapter{
         private final String LOG_TAG = ImageAdapter.class.getSimpleName();
         private Context mContext;
-        private String[] resultStrs;
+        private String[] resultStrs; // holds the poster_path of each Movie
 
+        //Constructor which takes context and Array of Strings as inputs
     public ImageAdapter(Context context, String[] strings) {
         mContext = context;
         resultStrs = strings;
     }
 
     @Override
+    //return the no. of Views to be displayed
     public int getCount() {
         return resultStrs.length;
     }
@@ -92,7 +99,10 @@ public class MainActivityFragment extends Fragment {
                 view = new ImageView(mContext);
             }
 
+            //Picasso easily load album art thumbnails into your views ...
+            //Picasso will handle loading the images on a background thread, image decompression and caching the images.
             String url = "http://image.tmdb.org/t/p/w185" + resultStrs[position];
+            //Fetches Images and load them into Views
             Picasso.with(mContext).load(url).into(view);
             return view;
         }
@@ -101,8 +111,6 @@ public class MainActivityFragment extends Fragment {
     public class FetchMovieTask extends AsyncTask<Void, Void, String[]> {
 
         private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
-
-
 
         private String[] getMovieDataFromJson(String movieJSONString)
                 throws JSONException{
@@ -119,6 +127,7 @@ public class MainActivityFragment extends Fragment {
             String[] resultImageStrs = new String[numMovies];
 
             for(int i=0;i<numMovies;i++){
+
                 JSONObject res = resultsArray.getJSONObject(i);
 
                 resultImageStrs[i] = res.getString(OWM_IMAGEPATH);
@@ -190,7 +199,7 @@ public class MainActivityFragment extends Fragment {
                     try {
                         reader.close();
                     } catch (final IOException e) {
-                        Log.e("MainActivityFragment", "Error Closing Stream", e);
+                        Log.e("PopularMovieListFragment", "Error Closing Stream", e);
                     }
                 }
             }
