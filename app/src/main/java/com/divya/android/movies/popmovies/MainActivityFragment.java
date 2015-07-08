@@ -33,6 +33,7 @@ import java.net.URL;
 public class MainActivityFragment extends Fragment {
 
     private  ImageAdapter mImageAdapter;
+    private GridView gridView;
 
     public MainActivityFragment() {
     }
@@ -48,12 +49,8 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        mImageAdapter = new ImageAdapter(getActivity());
-
         updateMoviesList();
-        GridView gridView = (GridView)rootView.findViewById(R.id.gridview);
-       //gridView.setAdapter(new ImageAdapter(getActivity()));
-        gridView.setAdapter(mImageAdapter);
+        gridView = (GridView)rootView.findViewById(R.id.gridview);
 
         return rootView;
     }
@@ -64,15 +61,18 @@ public class MainActivityFragment extends Fragment {
     }
 
     public class ImageAdapter extends BaseAdapter{
-    private Context mContext;
+        private final String LOG_TAG = ImageAdapter.class.getSimpleName();
+        private Context mContext;
+        private String[] resultStrs;
 
-    public ImageAdapter(Context context) {
+    public ImageAdapter(Context context, String[] strings) {
         mContext = context;
+        resultStrs = strings;
     }
 
     @Override
     public int getCount() {
-        return mThumbIds.length;
+        return resultStrs.length;
     }
 
     @Override
@@ -85,48 +85,17 @@ public class MainActivityFragment extends Fragment {
         return 0;
     }
 
-  /*  @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ImageView imageView;
-        if (convertView == null) {
-            // if it's not recycled, initialize some attributes
-            imageView = new ImageView(mContext);
-            imageView.setLayoutParams(new GridView.LayoutParams(85, 85));
-            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            imageView.setPadding(8, 8, 8, 8);
-        } else {
-            imageView = (ImageView) convertView;
-        }
-
-        imageView.setImageResource(mThumbIds[position]);
-       // Picasso.with(context).load("http://image.tmdb.org/t/p/w185/dkMD5qlogeRMiEixC4YNPUvax2T.jpg").into(imageView);
-        return imageView;
-    }*/
-
         @Override
-        public View getView(int position, View convertView, ViewGroup parent){
-            ImageView view = (ImageView)convertView;
-            if(view == null){
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ImageView view = (ImageView) convertView;
+            if (view == null) {
                 view = new ImageView(mContext);
             }
 
-            Picasso.with(mContext).load(mThumbIds[position]).into(view);
+            String url = "http://image.tmdb.org/t/p/w185" + resultStrs[position];
+            Picasso.with(mContext).load(url).into(view);
             return view;
         }
-    // references to our images
-    private Integer[] mThumbIds = {
-            R.drawable.sample_2, R.drawable.sample_3,
-            R.drawable.sample_4, R.drawable.sample_5,
-            R.drawable.sample_6, R.drawable.sample_7,
-            R.drawable.sample_0, R.drawable.sample_1,
-            R.drawable.sample_2, R.drawable.sample_3,
-            R.drawable.sample_4, R.drawable.sample_5,
-            R.drawable.sample_6, R.drawable.sample_7,
-            R.drawable.sample_0, R.drawable.sample_1,
-            R.drawable.sample_2, R.drawable.sample_3,
-            R.drawable.sample_4, R.drawable.sample_5,
-            R.drawable.sample_6, R.drawable.sample_7
-    };
 }
 
     public class FetchMovieTask extends AsyncTask<Void, Void, String[]> {
@@ -140,7 +109,7 @@ public class MainActivityFragment extends Fragment {
 
             // These are the names of the JSON objects that need to be extracted.
             final String OWM_RESULTS = "results";
-            final String OWM_IMAGEPATH= "backdrop_path";
+            final String OWM_IMAGEPATH= "poster_path";
 
 
             JSONObject movieJson = new JSONObject(movieJSONString);
@@ -153,7 +122,7 @@ public class MainActivityFragment extends Fragment {
                 JSONObject res = resultsArray.getJSONObject(i);
 
                 resultImageStrs[i] = res.getString(OWM_IMAGEPATH);
-                Log.v(LOG_TAG,"ImageStrs : " + resultImageStrs[i]);
+                //Log.v(LOG_TAG,"ImageStrs : " + resultImageStrs[i]);
             }
             return resultImageStrs;
         }
@@ -176,7 +145,7 @@ public class MainActivityFragment extends Fragment {
 
                 String myUri = builtUri.toString();
 
-                Log.v(LOG_TAG,"URL :" + myUri);
+               // Log.v(LOG_TAG,"URL :" + myUri);
                 URL url = new URL(myUri);
 
                 //Create the request to tmbdp and open the connection
@@ -239,7 +208,8 @@ public class MainActivityFragment extends Fragment {
         @Override
         protected void onPostExecute(String[] strings) {
             super.onPostExecute(strings);
-            
+            gridView.setAdapter(new ImageAdapter(getActivity(), strings));
+
         }
     }
 
