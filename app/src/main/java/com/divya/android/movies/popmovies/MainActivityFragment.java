@@ -13,6 +13,12 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.squareup.picasso.Picasso;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +32,7 @@ import java.net.URL;
  */
 public class MainActivityFragment extends Fragment {
 
+    private  ImageAdapter mImageAdapter;
 
     public MainActivityFragment() {
     }
@@ -41,9 +48,13 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        GridView gridView = (GridView)rootView.findViewById(R.id.gridview);
-        gridView.setAdapter(new ImageAdapter(getActivity()));
+        mImageAdapter = new ImageAdapter(getActivity());
+
         updateMoviesList();
+        GridView gridView = (GridView)rootView.findViewById(R.id.gridview);
+       //gridView.setAdapter(new ImageAdapter(getActivity()));
+        gridView.setAdapter(mImageAdapter);
+
         return rootView;
     }
 
@@ -74,7 +85,7 @@ public class MainActivityFragment extends Fragment {
         return 0;
     }
 
-    @Override
+  /*  @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ImageView imageView;
         if (convertView == null) {
@@ -88,8 +99,20 @@ public class MainActivityFragment extends Fragment {
         }
 
         imageView.setImageResource(mThumbIds[position]);
+       // Picasso.with(context).load("http://image.tmdb.org/t/p/w185/dkMD5qlogeRMiEixC4YNPUvax2T.jpg").into(imageView);
         return imageView;
-    }
+    }*/
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent){
+            ImageView view = (ImageView)convertView;
+            if(view == null){
+                view = new ImageView(mContext);
+            }
+
+            Picasso.with(mContext).load(mThumbIds[position]).into(view);
+            return view;
+        }
     // references to our images
     private Integer[] mThumbIds = {
             R.drawable.sample_2, R.drawable.sample_3,
@@ -106,11 +129,36 @@ public class MainActivityFragment extends Fragment {
     };
 }
 
-    public class FetchMovieTask extends AsyncTask<Void,Void,Void>{
+    public class FetchMovieTask extends AsyncTask<Void, Void, String[]> {
 
         private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
+
+
+
+        private String[] getMovieDataFromJson(String movieJSONString)
+                throws JSONException{
+
+            // These are the names of the JSON objects that need to be extracted.
+            final String OWM_RESULTS = "results";
+            final String OWM_IMAGEPATH= "backdrop_path";
+
+
+            JSONObject movieJson = new JSONObject(movieJSONString);
+            JSONArray resultsArray = movieJson.getJSONArray(OWM_RESULTS);
+
+            int numMovies = resultsArray.length();
+            String[] resultImageStrs = new String[numMovies];
+
+            for(int i=0;i<numMovies;i++){
+                JSONObject res = resultsArray.getJSONObject(i);
+
+                resultImageStrs[i] = res.getString(OWM_IMAGEPATH);
+                Log.v(LOG_TAG,"ImageStrs : " + resultImageStrs[i]);
+            }
+            return resultImageStrs;
+        }
         @Override
-        protected Void doInBackground(Void... params) {
+        protected String[] doInBackground(Void... params) {
 
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
@@ -159,7 +207,7 @@ public class MainActivityFragment extends Fragment {
 
                 movieJSONString = buffer.toString();
                 
-                Log.v(LOG_TAG,"movieJSONString : "+movieJSONString);
+
 
             }catch (IOException e){
                 // If the code didn't successfully get the weather data, there's no point in attemping
@@ -177,7 +225,21 @@ public class MainActivityFragment extends Fragment {
                     }
                 }
             }
+
+            try {
+                return getMovieDataFromJson(movieJSONString);
+            } catch (JSONException e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
+                e.printStackTrace();
+            }
+
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(String[] strings) {
+            super.onPostExecute(strings);
+            
         }
     }
 
