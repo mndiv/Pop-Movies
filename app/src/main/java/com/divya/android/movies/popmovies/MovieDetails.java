@@ -10,16 +10,16 @@ public class MovieDetails {
         return mPosterImage;
     }
 
-    public void setPosterImage(String posterImage) {
-        mPosterImage = posterImage;
-    }
-
     private String mPosterImage;
     private String mOverview;
-    private double mUserRating;
     private String mReleaseDate;
+    private double mUserRating;
 
-
-
-
+    public MovieDetails(String movieTitle, String posterImage, String overview, String releaseDate, double userRating) {
+        mMovieTitle = movieTitle;
+        mPosterImage = posterImage;
+        mOverview = overview;
+        mUserRating = userRating;
+        mReleaseDate = releaseDate;
+    }
 }

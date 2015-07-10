@@ -27,6 +27,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -39,7 +41,10 @@ public class PopularMovieListFragment extends Fragment {
     private String[] posterPaths;
     ImageAdapter imageAdapter;
 
+    List<MovieDetails> movieDetailsObj;
+
     public PopularMovieListFragment() {
+
     }
 
     @Override
@@ -54,23 +59,23 @@ public class PopularMovieListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        //updateMoviesList();
+        movieDetailsObj = new ArrayList<MovieDetails>();
+
         //Obtain the gridView ID . where rootView inflates the fragment_main.xml
         gridView = (GridView)rootView.findViewById(R.id.gridview);
+
 
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String posterQuery = (String) imageAdapter.getItem(position);
-
-                Intent intent = new Intent(getActivity(), DetailsActivity.class).putExtra(Intent.EXTRA_TEXT,posterQuery);
-                startActivity(intent);
+               // MovieDetails obj = (MovieDetails) imageAdapter.getItem(position);
+               // String posterPath = imageAdapter.getItem(position);
+               Intent intent = new Intent(getActivity(), DetailsActivity.class).putExtra(Intent.EXTRA_TEXT,(String)(imageAdapter.getItem(position)));
+               startActivity(intent);
             }
         });
-
-
-        return rootView;
+            return rootView;
     }
 
     private void updateMoviesList() {
@@ -85,27 +90,28 @@ public class PopularMovieListFragment extends Fragment {
         private Context mContext;
         private String[] resultStrs; // holds the poster_path of each Movie
 
-        MovieDetails[] movieDetailsObj;
+        //MovieDetails[] movieDetailsObj;
 
         //Constructor which takes context and Array of Strings as inputs
     public ImageAdapter(Context context, String[] strings) {
         mContext = context;
         resultStrs = strings;
-        movieDetailsObj = new MovieDetails[resultStrs.length];
-        for(int i=0;i<resultStrs.length;i++)
-            movieDetailsObj[i] = new MovieDetails();
+
     }
 
     @Override
     //return the no. of Views to be displayed
     public int getCount() {
-        return resultStrs.length;
+       // return resultStrs.length;
+        return movieDetailsObj.size();
     }
 
     @Override
     public Object getItem(int position) {
        // return resultStrs[position];
-        return movieDetailsObj[position].getPosterImage();
+        //return movieDetailsObj.size();
+        return movieDetailsObj.get(position).getPosterImage();
+      //  return movieDetailsObj.get(position);
     }
 
     @Override
@@ -122,15 +128,18 @@ public class PopularMovieListFragment extends Fragment {
 
             //Picasso easily load album art thumbnails into your views ...
             //Picasso will handle loading the images on a background thread, image decompression and caching the images.
-            String url = "http://image.tmdb.org/t/p/w185" + resultStrs[position];
-            movieDetailsObj[position].setPosterImage(url);
+           // String url = "http://image.tmdb.org/t/p/w185" + resultStrs[position];
+           //String url = movieDetailsObj.get(position).getPosterImage();
+
+
             //Fetches Images and load them into Views
-            Picasso.with(mContext).load(url).into(view);
+            Picasso.with(mContext).load(movieDetailsObj.get(position).getPosterImage()).into(view);
             return view;
         }
 }
 
     public class FetchMovieTask extends AsyncTask<Void, Void, String[]> {
+
 
         private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
 
@@ -139,7 +148,11 @@ public class PopularMovieListFragment extends Fragment {
 
             // These are the names of the JSON objects that need to be extracted.
             final String OWM_RESULTS = "results";
+            final String OWM_TITLE = "original_title";
             final String OWM_IMAGEPATH= "poster_path";
+            final String OWM_OVERVIEW = "overview";
+            final String OWM_RELEASEDATE = "release_date";
+            final String OWM_USERRATING = "vote_average";
 
 
             JSONObject movieJson = new JSONObject(movieJSONString);
@@ -153,7 +166,17 @@ public class PopularMovieListFragment extends Fragment {
                 JSONObject res = resultsArray.getJSONObject(i);
 
                 resultImageStrs[i] = res.getString(OWM_IMAGEPATH);
-                //Log.v(LOG_TAG,"ImageStrs : " + resultImageStrs[i]);
+                movieDetailsObj.add(new MovieDetails((String)res.getString(OWM_TITLE),
+                        "http://image.tmdb.org/t/p/w185" + res.getString(OWM_IMAGEPATH),
+                                            res.getString(OWM_OVERVIEW),
+                                            res.getString(OWM_RELEASEDATE),
+                                            res.getDouble(OWM_USERRATING)));
+
+            /*    Log.v(LOG_TAG, "Movie Info : " + movieDetailsObj[i].getMovieTitle() + "-"
+                                            +movieDetailsObj[i].getPosterImage()+"-"
+                                            +movieDetailsObj[i].getOverview()+"-"
+                                            +movieDetailsObj[i].getUserRating()+"-"
+                                            +movieDetailsObj[i].getReleaseDate());*/
             }
             return resultImageStrs;
         }
