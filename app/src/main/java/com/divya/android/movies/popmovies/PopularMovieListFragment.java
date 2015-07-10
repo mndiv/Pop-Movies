@@ -1,6 +1,7 @@
 package com.divya.android.movies.popmovies;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -34,6 +36,8 @@ public class PopularMovieListFragment extends Fragment {
 
     //gridView holds the id defined in fragment_main.xml
     private GridView gridView;
+    private String[] posterPaths;
+    ImageAdapter imageAdapter;
 
     public PopularMovieListFragment() {
     }
@@ -55,6 +59,17 @@ public class PopularMovieListFragment extends Fragment {
         gridView = (GridView)rootView.findViewById(R.id.gridview);
 
 
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String posterQuery = (String) imageAdapter.getItem(position);
+
+                Intent intent = new Intent(getActivity(), DetailsActivity.class).putExtra(Intent.EXTRA_TEXT,posterQuery);
+                startActivity(intent);
+            }
+        });
+
+
         return rootView;
     }
 
@@ -70,10 +85,15 @@ public class PopularMovieListFragment extends Fragment {
         private Context mContext;
         private String[] resultStrs; // holds the poster_path of each Movie
 
+        MovieDetails[] movieDetailsObj;
+
         //Constructor which takes context and Array of Strings as inputs
     public ImageAdapter(Context context, String[] strings) {
         mContext = context;
         resultStrs = strings;
+        movieDetailsObj = new MovieDetails[resultStrs.length];
+        for(int i=0;i<resultStrs.length;i++)
+            movieDetailsObj[i] = new MovieDetails();
     }
 
     @Override
@@ -84,7 +104,8 @@ public class PopularMovieListFragment extends Fragment {
 
     @Override
     public Object getItem(int position) {
-        return null;
+       // return resultStrs[position];
+        return movieDetailsObj[position].getPosterImage();
     }
 
     @Override
@@ -102,6 +123,7 @@ public class PopularMovieListFragment extends Fragment {
             //Picasso easily load album art thumbnails into your views ...
             //Picasso will handle loading the images on a background thread, image decompression and caching the images.
             String url = "http://image.tmdb.org/t/p/w185" + resultStrs[position];
+            movieDetailsObj[position].setPosterImage(url);
             //Fetches Images and load them into Views
             Picasso.with(mContext).load(url).into(view);
             return view;
@@ -199,7 +221,7 @@ public class PopularMovieListFragment extends Fragment {
                     try {
                         reader.close();
                     } catch (final IOException e) {
-                        Log.e("PopularMovieListFragment", "Error Closing Stream", e);
+                        Log.e(LOG_TAG, "Error Closing Stream", e);
                     }
                 }
             }
@@ -217,7 +239,10 @@ public class PopularMovieListFragment extends Fragment {
         @Override
         protected void onPostExecute(String[] strings) {
             super.onPostExecute(strings);
-            gridView.setAdapter(new ImageAdapter(getActivity(), strings));
+            posterPaths = strings;
+            imageAdapter = new ImageAdapter(getActivity(),strings);
+            gridView.setAdapter(imageAdapter);
+
 
         }
     }
