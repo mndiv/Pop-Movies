@@ -6,7 +6,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class DetailsActivity extends ActionBarActivity {
+public class MovieDetail extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -11,10 +11,10 @@ import android.view.ViewGroup;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class DetailsActivityFragment extends Fragment {
+public class MovieDetailFragment extends Fragment {
 
     private String mPosterPath;
-    public DetailsActivityFragment() {
+    public MovieDetailFragment() {
     }
 
     @Override
@@ -33,7 +33,7 @@ public class DetailsActivityFragment extends Fragment {
         }*/
 
         Bundle data = intent.getExtras();
-        MovieDetails obj = data.getParcelable("MovieDetails");
+        MovieInfo obj = data.getParcelable("MovieInfo");
         return rootView;
     }
 }

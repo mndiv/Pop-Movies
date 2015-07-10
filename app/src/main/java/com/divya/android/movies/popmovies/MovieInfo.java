@@ -5,7 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 //New class is defined to hold the Movie Data
-public class MovieDetails implements Parcelable{
+public class MovieInfo implements Parcelable{
 
     private String mMovieTitle;
 
@@ -18,7 +18,7 @@ public class MovieDetails implements Parcelable{
     private String mReleaseDate;
     private double mUserRating;
 
-    public MovieDetails(String movieTitle, String posterImage, String overview, String releaseDate, double userRating) {
+    public MovieInfo(String movieTitle, String posterImage, String overview, String releaseDate, double userRating) {
         mMovieTitle = movieTitle;
         mPosterImage = posterImage;
         mOverview = overview;
@@ -27,7 +27,7 @@ public class MovieDetails implements Parcelable{
     }
 
     //Parcelling Part
-    public MovieDetails(Parcel in){
+    public MovieInfo(Parcel in){
         String[] data = new String[5];
         double rating;
 
@@ -53,11 +53,11 @@ public class MovieDetails implements Parcelable{
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator(){
-        public MovieDetails createFromParcel(Parcel in){
-            return new MovieDetails(in);
+        public MovieInfo createFromParcel(Parcel in){
+            return new MovieInfo(in);
         }
-        public MovieDetails[] newArray(int size){
-            return new MovieDetails[size];
+        public MovieInfo[] newArray(int size){
+            return new MovieInfo[size];
         }
     };
 }

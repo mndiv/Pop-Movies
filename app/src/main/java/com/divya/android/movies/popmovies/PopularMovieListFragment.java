@@ -41,7 +41,7 @@ public class PopularMovieListFragment extends Fragment {
     private String[] posterPaths;
     ImageAdapter imageAdapter;
 
-    List<MovieDetails> movieDetailsObj;
+    List<MovieInfo> movieDetailsObj;
 
     public PopularMovieListFragment() {
 
@@ -59,7 +59,7 @@ public class PopularMovieListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        movieDetailsObj = new ArrayList<MovieDetails>();
+        movieDetailsObj = new ArrayList<MovieInfo>();
 
         //Obtain the gridView ID . where rootView inflates the fragment_main.xml
         gridView = (GridView)rootView.findViewById(R.id.gridview);
@@ -69,10 +69,10 @@ public class PopularMovieListFragment extends Fragment {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                MovieDetails obj = (MovieDetails) imageAdapter.getItem(position);
+                MovieInfo obj = (MovieInfo) imageAdapter.getItem(position);
                // String posterPath = imageAdapter.getItem(position);
-               Intent intent = new Intent(getActivity(), DetailsActivity.class);
-                intent.putExtra("MovieDetails",obj);
+               Intent intent = new Intent(getActivity(), MovieDetail.class);
+                intent.putExtra("MovieInfo", obj);
                startActivity(intent);
             }
         });
@@ -91,7 +91,7 @@ public class PopularMovieListFragment extends Fragment {
         private Context mContext;
         private String[] resultStrs; // holds the poster_path of each Movie
 
-        //MovieDetails[] movieDetailsObj;
+        //MovieInfo[] movieDetailsObj;
 
         //Constructor which takes context and Array of Strings as inputs
     public ImageAdapter(Context context, String[] strings) {
@@ -167,7 +167,7 @@ public class PopularMovieListFragment extends Fragment {
                 JSONObject res = resultsArray.getJSONObject(i);
 
                 resultImageStrs[i] = res.getString(OWM_IMAGEPATH);
-                movieDetailsObj.add(new MovieDetails((String)res.getString(OWM_TITLE),
+                movieDetailsObj.add(new MovieInfo((String)res.getString(OWM_TITLE),
                         "http://image.tmdb.org/t/p/w185" + res.getString(OWM_IMAGEPATH),
                                             res.getString(OWM_OVERVIEW),
                                             res.getString(OWM_RELEASEDATE),
