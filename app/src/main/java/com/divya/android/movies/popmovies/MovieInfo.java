@@ -7,6 +7,22 @@ import android.os.Parcelable;
 //New class is defined to hold the Movie Data
 public class MovieInfo implements Parcelable{
 
+    public String getMovieTitle() {
+        return mMovieTitle;
+    }
+
+    public String getOverview() {
+        return mOverview;
+    }
+
+    public String getReleaseDate() {
+        return mReleaseDate;
+    }
+
+    public double getUserRating() {
+        return mUserRating;
+    }
+
     private String mMovieTitle;
 
     public String getPosterImage() {
