@@ -69,9 +69,10 @@ public class PopularMovieListFragment extends Fragment {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-               // MovieDetails obj = (MovieDetails) imageAdapter.getItem(position);
+                MovieDetails obj = (MovieDetails) imageAdapter.getItem(position);
                // String posterPath = imageAdapter.getItem(position);
-               Intent intent = new Intent(getActivity(), DetailsActivity.class).putExtra(Intent.EXTRA_TEXT,(String)(imageAdapter.getItem(position)));
+               Intent intent = new Intent(getActivity(), DetailsActivity.class);
+                intent.putExtra("MovieDetails",obj);
                startActivity(intent);
             }
         });
@@ -110,8 +111,8 @@ public class PopularMovieListFragment extends Fragment {
     public Object getItem(int position) {
        // return resultStrs[position];
         //return movieDetailsObj.size();
-        return movieDetailsObj.get(position).getPosterImage();
-      //  return movieDetailsObj.get(position);
+        //return movieDetailsObj.get(position).getPosterImage();
+        return movieDetailsObj.get(position);
     }
 
     @Override

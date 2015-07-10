@@ -6,9 +6,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-
-import com.squareup.picasso.Picasso;
 
 
 /**
@@ -26,13 +23,17 @@ public class DetailsActivityFragment extends Fragment {
         View rootView =  inflater.inflate(R.layout.fragment_details, container, false);
 
         Intent intent = getActivity().getIntent();
-        mPosterPath = intent.getStringExtra(Intent.EXTRA_TEXT);
+
+        /*mPosterPath = intent.getStringExtra(Intent.EXTRA_TEXT);
 
         if ((intent != null) && intent.hasExtra(intent.EXTRA_TEXT)) {
            // ((TextView) rootView.findViewById(R.id.posterPath)).setText(mPosterPath);
             ImageView view = (ImageView)rootView.findViewById(R.id.posterPath);
             Picasso.with(getActivity()).load(mPosterPath).into(view);
-        }
+        }*/
+
+        Bundle data = intent.getExtras();
+        MovieDetails obj = data.getParcelable("MovieDetails");
         return rootView;
     }
 }
