@@ -3,6 +3,9 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_settings">SettingsActivity</string>
-    <string name="title_activity_details">DetailsActivity</string>
+    <string name="title_activity_details">MovieDetail</string>
     <string name="markFavorite">Mark As Favorite</string>
+    <string name="trailers">Trailers:</string>
+    <string name="trailer1">Trailer1</string>
+    <string name="trailer2">Trailer2</string>
 </resources>

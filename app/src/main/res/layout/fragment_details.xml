@@ -1,3 +1,7 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
@@ -70,4 +74,77 @@
 
     </LinearLayout>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/overview"
+
+        android:elegantTextHeight="false"/>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="3dp"
+        android:background="#c0c0c0"
+        android:layout_marginBottom="10dp"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/trailers"
+        android:textSize="25sp"
+
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="1">
+        <ImageButton
+            android:layout_width="61dp"
+            android:layout_height="69dp"
+            android:src="@drawable/play_2"
+            android:layout_marginLeft="50dp"
+            android:cropToPadding="false"
+            android:scaleType="centerCrop"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/trailer1"
+            android:textSize="25sp"
+            android:gravity="center_vertical|center_horizontal"
+            android:paddingLeft="50dp"
+            android:paddingTop="25dp"/>
+    </LinearLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="3dp"
+        android:background="#c0c0c0"
+        android:layout_marginBottom="10dp"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="1">
+        <ImageButton
+            android:layout_width="61dp"
+            android:layout_height="69dp"
+            android:src="@drawable/play_2"
+            android:layout_marginLeft="50dp"
+            android:cropToPadding="false"
+            android:scaleType="centerCrop"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/trailer2"
+            android:textSize="25sp"
+            android:gravity="center_vertical|center_horizontal"
+            android:paddingLeft="50dp"
+            android:paddingTop="25dp"/>
+    </LinearLayout>
 </LinearLayout>
+</ScrollView>

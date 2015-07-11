@@ -56,8 +56,15 @@ public class MovieDetailFragment extends Fragment {
         TextView userRating = (TextView)rootView.findViewById(R.id.userRating);
         userRating.setText(Double.toString(obj.getUserRating())+"/10");
 
-       // TextView overview = (TextView)rootView.findViewById(R.id.overview);
-       // userRating.setText(obj.getOverview());
+        TextView overview = (TextView)rootView.findViewById(R.id.overview);
+
+        String input = obj.getOverview();
+//        String[] words = input.split("\\.");
+//
+//        if(words.length >= 3)
+//            overview.setText(words[0]+words[1]+words[2]);
+//        else
+        overview.setText(input);
 
         return rootView;
     }
