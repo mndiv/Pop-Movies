@@ -2,9 +2,11 @@ package com.divya.android.movies.popmovies;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,14 +40,16 @@ public class PopularMovieListFragment extends Fragment {
 
     //gridView holds the id defined in fragment_main.xml
     private GridView gridView;
-    private String[] posterPaths;
-    ImageAdapter imageAdapter;
 
+    ImageAdapter imageAdapter;
+    private SharedPreferences sharedPrefs;
+    String[] strings;
     List<MovieInfo> movieDetailsObj;
 
     public PopularMovieListFragment() {
 
     }
+
 
 
     @Override
@@ -59,39 +63,40 @@ public class PopularMovieListFragment extends Fragment {
         //Obtain the gridView ID . where rootView inflates the fragment_main.xml
         gridView = (GridView)rootView.findViewById(R.id.gridview);
 
+        imageAdapter = new ImageAdapter(getActivity());
 
+        gridView.setAdapter(imageAdapter);
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 MovieInfo obj = (MovieInfo) imageAdapter.getItem(position);
-               // String posterPath = imageAdapter.getItem(position);
                Intent intent = new Intent(getActivity(), MovieDetail.class);
                 intent.putExtra("MovieInfo", obj);
                startActivity(intent);
             }
         });
-            return rootView;
+        return rootView;
     }
 
     private void updateMoviesList() {
         //This creates an AsyncTask FetchMovieTask() which runs in other thread than main thread.
         FetchMovieTask movieTask = new FetchMovieTask();
-
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         movieTask.execute();
-    }
+}
 
     public class ImageAdapter extends BaseAdapter{
         private final String LOG_TAG = ImageAdapter.class.getSimpleName();
         private Context mContext;
-        private String[] resultStrs; // holds the poster_path of each Movie
+       // private String[] resultStrs; // holds the poster_path of each Movie
 
         //MovieInfo[] movieDetailsObj;
 
         //Constructor which takes context and Array of Strings as inputs
-    public ImageAdapter(Context context, String[] strings) {
+    public ImageAdapter(Context context/*, String[] strings*/) {
         mContext = context;
-        resultStrs = strings;
+        //resultStrs = strings;
 
     }
 
@@ -115,29 +120,39 @@ public class PopularMovieListFragment extends Fragment {
         return 0;
     }
 
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ImageView view = (ImageView) convertView;
-            if (view == null) {
-                view = new ImageView(mContext);
-            }
-
-            //Picasso easily load album art thumbnails into your views ...
-            //Picasso will handle loading the images on a background thread, image decompression and caching the images.
-           // String url = "http://image.tmdb.org/t/p/w185" + resultStrs[position];
-           //String url = movieDetailsObj.get(position).getPosterImage();
-
-
-            //Fetches Images and load them into Views
-            Picasso.with(mContext).load(movieDetailsObj.get(position).getPosterImage()).into(view);
-            return view;
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        ImageView view = (ImageView) convertView;
+        if (view == null) {
+            view = new ImageView(mContext);
         }
-}
+
+        //Picasso easily load album art thumbnails into your views ...
+        //Picasso will handle loading the images on a background thread, image decompression and caching the images.
+       // String url = "http://image.tmdb.org/t/p/w185" + resultStrs[position];
+       //String url = movieDetailsObj.get(position).getPosterImage();
+
+
+        //Fetches Images and load them into Views
+        Picasso.with(mContext).load(movieDetailsObj.get(position).getPosterImage()).into(view);
+        return view;
+    }
+
+        public void clear() {
+            movieDetailsObj.clear();
+        }
+    }
 
     public class FetchMovieTask extends AsyncTask<Void, Void, String[]> {
 
 
         private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
+     @Override
+        protected void onPreExecute() {
+            //imageAdapter.clear();
+
+            super.onPreExecute();
+        }
 
         private String[] getMovieDataFromJson(String movieJSONString)
                 throws JSONException{
@@ -189,8 +204,14 @@ public class PopularMovieListFragment extends Fragment {
                 final String SORT_PARAM = "sort_by";
                 final String API_KEY = "api_key";
 
+                String key = getString(R.string.pref_sortby_key);
+                String value = getString(R.string.pref_sortby_default);
+                String abc  = sharedPrefs.getString(key,value);
+                String sortby = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
+
+
                 Uri builtUri = Uri.parse(MOVIES_BASE_URL).buildUpon()
-                                .appendQueryParameter(SORT_PARAM,"popularity.desc")
+                                .appendQueryParameter(SORT_PARAM,sortby)
                                 .appendQueryParameter(API_KEY,"2fc475941d44b7da433d1f18e24e2551").build();
 
                 String myUri = builtUri.toString();
@@ -258,10 +279,7 @@ public class PopularMovieListFragment extends Fragment {
         @Override
         protected void onPostExecute(String[] strings) {
             super.onPostExecute(strings);
-            posterPaths = strings;
-            imageAdapter = new ImageAdapter(getActivity(),strings);
-            gridView.setAdapter(imageAdapter);
-
+            imageAdapter.notifyDataSetChanged();
 
         }
     }
