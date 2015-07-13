@@ -115,6 +115,9 @@ public class PopularMovieListFragment extends Fragment {
         ImageView view = (ImageView) convertView;
         if (view == null) {
             view = new ImageView(mContext);
+            view.setLayoutParams(new GridView.LayoutParams(220, 220));
+            //view.setScaleType(ImageView.ScaleType.CENTER_CROP);
+           //view.setPadding(0, 0, 0, 0);
         }
 
         //Picasso easily load album art thumbnails into your views ...
@@ -124,9 +127,6 @@ public class PopularMovieListFragment extends Fragment {
         return view;
     }
 
-        public void clear() {
-            movieDetailsObj.clear();
-        }
     }
 
     public class FetchMovieTask extends AsyncTask<Void, Void, String[]> {
