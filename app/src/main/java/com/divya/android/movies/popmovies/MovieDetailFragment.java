@@ -28,14 +28,6 @@ public class MovieDetailFragment extends Fragment {
 
         Intent intent = getActivity().getIntent();
 
-        /*mPosterPath = intent.getStringExtra(Intent.EXTRA_TEXT);
-
-        if ((intent != null) && intent.hasExtra(intent.EXTRA_TEXT)) {
-           // ((TextView) rootView.findViewById(R.id.posterPath)).setText(mPosterPath);
-            ImageView view = (ImageView)rootView.findViewById(R.id.posterPath);
-            Picasso.with(getActivity()).load(mPosterPath).into(view);
-        }*/
-
         Bundle data = intent.getExtras();
         MovieInfo obj = data.getParcelable("MovieInfo");
 

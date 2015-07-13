@@ -40,32 +40,32 @@ public class PopularMovieListFragment extends Fragment {
 
     //gridView holds the id defined in fragment_main.xml
     private GridView gridView;
-
     ImageAdapter imageAdapter;
     private SharedPreferences sharedPrefs;
-    String[] strings;
     List<MovieInfo> movieDetailsObj;
 
     public PopularMovieListFragment() {
 
     }
 
-
+    @Override
+    public void onStart() {
+        super.onStart();
+        movieDetailsObj = new ArrayList<MovieInfo>();
+        updateMoviesList();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        updateMoviesList();
-        movieDetailsObj = new ArrayList<MovieInfo>();
+
+        //movieDetailsObj = new ArrayList<MovieInfo>();
 
         //Obtain the gridView ID . where rootView inflates the fragment_main.xml
         gridView = (GridView)rootView.findViewById(R.id.gridview);
-
         imageAdapter = new ImageAdapter(getActivity());
-
-        gridView.setAdapter(imageAdapter);
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -89,29 +89,19 @@ public class PopularMovieListFragment extends Fragment {
     public class ImageAdapter extends BaseAdapter{
         private final String LOG_TAG = ImageAdapter.class.getSimpleName();
         private Context mContext;
-       // private String[] resultStrs; // holds the poster_path of each Movie
-
-        //MovieInfo[] movieDetailsObj;
-
-        //Constructor which takes context and Array of Strings as inputs
-    public ImageAdapter(Context context/*, String[] strings*/) {
+        //Constructor which takes context as inputs
+    public ImageAdapter(Context context) {
         mContext = context;
-        //resultStrs = strings;
-
     }
 
     @Override
     //return the no. of Views to be displayed
     public int getCount() {
-       // return resultStrs.length;
         return movieDetailsObj.size();
     }
 
     @Override
     public Object getItem(int position) {
-       // return resultStrs[position];
-        //return movieDetailsObj.size();
-        //return movieDetailsObj.get(position).getPosterImage();
         return movieDetailsObj.get(position);
     }
 
@@ -129,10 +119,6 @@ public class PopularMovieListFragment extends Fragment {
 
         //Picasso easily load album art thumbnails into your views ...
         //Picasso will handle loading the images on a background thread, image decompression and caching the images.
-       // String url = "http://image.tmdb.org/t/p/w185" + resultStrs[position];
-       //String url = movieDetailsObj.get(position).getPosterImage();
-
-
         //Fetches Images and load them into Views
         Picasso.with(mContext).load(movieDetailsObj.get(position).getPosterImage()).into(view);
         return view;
@@ -147,12 +133,7 @@ public class PopularMovieListFragment extends Fragment {
 
 
         private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
-     @Override
-        protected void onPreExecute() {
-            //imageAdapter.clear();
 
-            super.onPreExecute();
-        }
 
         private String[] getMovieDataFromJson(String movieJSONString)
                 throws JSONException{
@@ -182,13 +163,8 @@ public class PopularMovieListFragment extends Fragment {
                                             res.getString(OWM_OVERVIEW),
                                             res.getString(OWM_RELEASEDATE),
                                             res.getDouble(OWM_USERRATING)));
-
-            /*    Log.v(LOG_TAG, "Movie Info : " + movieDetailsObj[i].getMovieTitle() + "-"
-                                            +movieDetailsObj[i].getPosterImage()+"-"
-                                            +movieDetailsObj[i].getOverview()+"-"
-                                            +movieDetailsObj[i].getUserRating()+"-"
-                                            +movieDetailsObj[i].getReleaseDate());*/
             }
+
             return resultImageStrs;
         }
         @Override
@@ -204,14 +180,11 @@ public class PopularMovieListFragment extends Fragment {
                 final String SORT_PARAM = "sort_by";
                 final String API_KEY = "api_key";
 
-                String key = getString(R.string.pref_sortby_key);
-                String value = getString(R.string.pref_sortby_default);
-                String abc  = sharedPrefs.getString(key,value);
-                String sortby = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
+                String sortBy = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
 
 
                 Uri builtUri = Uri.parse(MOVIES_BASE_URL).buildUpon()
-                                .appendQueryParameter(SORT_PARAM,sortby)
+                                .appendQueryParameter(SORT_PARAM,sortBy)
                                 .appendQueryParameter(API_KEY,"2fc475941d44b7da433d1f18e24e2551").build();
 
                 String myUri = builtUri.toString();
@@ -280,6 +253,7 @@ public class PopularMovieListFragment extends Fragment {
         protected void onPostExecute(String[] strings) {
             super.onPostExecute(strings);
             imageAdapter.notifyDataSetChanged();
+            gridView.setAdapter(imageAdapter);
 
         }
     }

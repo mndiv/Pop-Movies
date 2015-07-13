@@ -10,7 +10,7 @@
     <string name="trailer2">Trailer2</string>
     <string name="pref_sortby_key">sort</string>
     <string name="pref_sortby_label">Sort by</string>
-    <string name="pref_sortby_default">popularity.desc</string>
+    <string name="pref_sortby_default">vote_average.desc</string>
 
     <string name="pref_sorby_label_popular">Most Popular</string>
     <string name="pref_sortby_label_rating">Highest Rating</string>
