@@ -3,7 +3,6 @@ package com.divya.android.movies.popmovies;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -23,14 +22,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 
 /**
@@ -43,6 +40,8 @@ public class PopularMovieListFragment extends Fragment {
     ImageAdapter imageAdapter;
     private SharedPreferences sharedPrefs;
     List<MovieInfo> movieDetailsObj;
+    private RetainedAppData mRetainedAppData; //abcd
+    protected final String TAG = getClass().getSimpleName(); //abcd
 
     public PopularMovieListFragment() {
 
@@ -60,6 +59,8 @@ public class PopularMovieListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
+        mRetainedAppData = new RetainedAppData(); //abcd
+        Log.d(TAG, "onCreate(): Creating new  data set");
 
         //movieDetailsObj = new ArrayList<MovieInfo>();
 
@@ -116,23 +117,55 @@ public class PopularMovieListFragment extends Fragment {
         if (view == null) {
             view = new ImageView(mContext);
             view.setLayoutParams(new GridView.LayoutParams(220, 220));
-            //view.setScaleType(ImageView.ScaleType.CENTER_CROP);
-           //view.setPadding(0, 0, 0, 0);
         }
 
         //Picasso easily load album art thumbnails into your views ...
         //Picasso will handle loading the images on a background thread, image decompression and caching the images.
         //Fetches Images and load them into Views
-        Picasso.with(mContext).load(movieDetailsObj.get(position).getPosterImage()).into(view);
+        Picasso.with(mContext).load(movieDetailsObj.get(position).getPoster_path()).into(view);
         return view;
     }
 
     }
 
+    //abcd
+    private class RetainedAppData {
+        private Results mData;
+        private GetMovieDataRestAdapter mGetMovieDataRestAdapter; //RE ST Adapter
+        private Callback<Results> mMovieInfoCallback = new Callback<Results>() {
+
+            public void success(Results data, Response response) {
+
+
+                for (int i = 0; i < data.getMovieInfo().size(); i++) {
+                    Log.d(TAG, "Async Success: MovieData: title:" + data.getMovieInfo().get(i).getOriginal_title() +
+                                    ", poster_path:" + data.getMovieInfo().get(i).getPoster_path() +
+                                    ", overview:" + data.getMovieInfo().get(i).getOverview() +
+                                    ", release_data:" + data.getMovieInfo().get(i).getRelease_date() +
+                                    ",vote_average:" + data.getMovieInfo().get(i).getVote_average()
+                    );
+
+                    mData.mMovieInfo.add(data.mMovieInfo.get(i));
+                }
+            }
+            @Override
+            public void failure(RetrofitError error) {
+                Log.d(TAG, "failure: " + error);
+            }
+        };
+
+        public void runRetrofitTest(final String sortBy, final String api_key){
+            if(mGetMovieDataRestAdapter == null){
+                mGetMovieDataRestAdapter = new GetMovieDataRestAdapter();
+            }
+            mGetMovieDataRestAdapter.testMovieDataApi(sortBy, api_key, mMovieInfoCallback);
+        }
+    }
     public class FetchMovieTask extends AsyncTask<Void, Void, String[]> {
 
 
         private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
+
 
 
         private String[] getMovieDataFromJson(String movieJSONString)
@@ -170,7 +203,8 @@ public class PopularMovieListFragment extends Fragment {
         @Override
         protected String[] doInBackground(Void... params) {
 
-            HttpURLConnection urlConnection = null;
+            //abcd
+           /* HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
             String movieJSONString = null;
 
@@ -244,7 +278,18 @@ public class PopularMovieListFragment extends Fragment {
             } catch (JSONException e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
                 e.printStackTrace();
-            }
+            }*/ //abcd
+
+            //abcd
+
+            final String SORT_PARAM = "sort_by";
+            final String API_KEY = "api_key";
+
+            String sortBy = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
+            String api_key = "2fc475941d44b7da433d1f18e24e2551";
+
+            mRetainedAppData.runRetrofitTest(sortBy,api_key);
+
 
             return null;
         }

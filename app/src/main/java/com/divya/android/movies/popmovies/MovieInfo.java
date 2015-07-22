@@ -4,42 +4,56 @@ package com.divya.android.movies.popmovies;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 //New class is defined to hold the Movie Data
 public class MovieInfo implements Parcelable{
 
-    public String getMovieTitle() {
-        return mMovieTitle;
+    @SerializedName("original_title")
+    private String original_title;
+
+    @SerializedName("overview")
+    private String overview;
+
+    @SerializedName("release_date")
+    private String release_date;
+
+    @SerializedName("poster_path")
+    private String poster_path;
+
+    @SerializedName("vote_average")
+    private double vote_average;
+
+    public String getOriginal_title() {
+        return original_title;
     }
 
     public String getOverview() {
-        return mOverview;
+        return overview;
     }
 
-    public String getReleaseDate() {
-        return mReleaseDate;
+    public String getRelease_date() {
+        return release_date;
     }
 
-    public double getUserRating() {
-        return mUserRating;
+    public double getVote_average() {
+        return vote_average;
     }
 
-    private String mMovieTitle;
 
-    public String getPosterImage() {
-        return mPosterImage;
+
+    public String getPoster_path() {
+        return ("http://image.tmdb.org/t/p/w185" + poster_path);
     }
 
-    private String mPosterImage;
-    private String mOverview;
-    private String mReleaseDate;
-    private double mUserRating;
 
-    public MovieInfo(String movieTitle, String posterImage, String overview, String releaseDate, double userRating) {
-        mMovieTitle = movieTitle;
-        mPosterImage = posterImage;
-        mOverview = overview;
-        mUserRating = userRating;
-        mReleaseDate = releaseDate;
+
+    public MovieInfo(String movieTitle, String posterImage, String overView, String releaseDate, double userRating) {
+        original_title = movieTitle;
+        poster_path = posterImage;
+        overview = overView;
+        vote_average = userRating;
+        release_date = releaseDate;
     }
 
     //Parcelling Part
@@ -48,11 +62,11 @@ public class MovieInfo implements Parcelable{
         double rating;
 
         in.readStringArray(data);
-        this.mMovieTitle = data[0];
-        this.mPosterImage = data[1];
-        this.mOverview = data[2];
-        this.mReleaseDate = data[3];
-        this.mUserRating = Double.parseDouble(data[4]);
+        this.original_title = data[0];
+        this.poster_path = data[1];
+        this.overview = data[2];
+        this.release_date = data[3];
+        this.vote_average = Double.parseDouble(data[4]);
     }
     @Override
     public int describeContents() {
@@ -61,11 +75,11 @@ public class MovieInfo implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeStringArray(new String[]{this.mMovieTitle,
-                                            this.mPosterImage,
-                                            this.mOverview,
-                                            this.mReleaseDate,
-                                            Double.toString(this.mUserRating)});
+        dest.writeStringArray(new String[]{this.original_title,
+                                            this.poster_path,
+                                            this.overview,
+                                            this.release_date,
+                                            Double.toString(this.vote_average)});
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator(){
