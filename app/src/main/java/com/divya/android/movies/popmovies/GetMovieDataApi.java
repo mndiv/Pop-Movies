@@ -1,5 +1,7 @@
 package com.divya.android.movies.popmovies;
 
+import java.util.List;
+
 import retrofit.Callback;
 import retrofit.http.GET;
 import retrofit.http.Query;
@@ -12,5 +14,5 @@ public interface GetMovieDataApi {
     void getMovieDataFromApi(
             @Query("sort_by") String sortBy,
             @Query("api_key") String apiKey,
-            Callback<Results> callback);
+            Callback<List<MovieInfo>> callback);
 }

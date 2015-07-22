@@ -130,22 +130,20 @@ public class PopularMovieListFragment extends Fragment {
 
     //abcd
     private class RetainedAppData {
-        private Results mData;
-        private GetMovieDataRestAdapter mGetMovieDataRestAdapter; //RE ST Adapter
-        private Callback<Results> mMovieInfoCallback = new Callback<Results>() {
+        private List<MovieInfo> mData;
+        private GetMovieDataRestAdapter mGetMovieDataRestAdapter; //REST Adapter
+        private Callback<List<MovieInfo>> mMovieInfoCallback = new Callback<List<MovieInfo>>() {
 
-            public void success(Results data, Response response) {
-
-
-                for (int i = 0; i < data.getMovieInfo().size(); i++) {
-                    Log.d(TAG, "Async Success: MovieData: title:" + data.getMovieInfo().get(i).getOriginal_title() +
-                                    ", poster_path:" + data.getMovieInfo().get(i).getPoster_path() +
-                                    ", overview:" + data.getMovieInfo().get(i).getOverview() +
-                                    ", release_data:" + data.getMovieInfo().get(i).getRelease_date() +
-                                    ",vote_average:" + data.getMovieInfo().get(i).getVote_average()
+            public void success(List<MovieInfo> data, Response response) {
+                for (int i = 0; i < data.size(); i++) {
+                    Log.d(TAG, "Async Success: MovieData: title:" + data.get(i).getOriginal_title() +
+                                    ", poster_path:" + data.get(i).getPoster_path() +
+                                    ", overview:" + data.get(i).getOverview() +
+                                    ", release_data:" + data.get(i).getRelease_date() +
+                                    ",vote_average:" + data.get(i).getVote_average()
                     );
 
-                    mData.mMovieInfo.add(data.mMovieInfo.get(i));
+                    mData.add(data.get(i));
                 }
             }
             @Override

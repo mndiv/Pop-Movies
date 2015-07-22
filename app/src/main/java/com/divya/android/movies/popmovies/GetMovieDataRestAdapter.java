@@ -5,6 +5,8 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.util.List;
+
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
@@ -33,7 +35,7 @@ public class GetMovieDataRestAdapter {
         Log.d(TAG, "GetMovieDataRestAdapter -- created" );
     }
 
-    public void testMovieDataApi(String sortBy, String apiKey, Callback<Results> callback){
+    public void testMovieDataApi(String sortBy, String apiKey, Callback<List<MovieInfo>> callback){
         mApi.getMovieDataFromApi(sortBy, apiKey, callback);
 
     }
