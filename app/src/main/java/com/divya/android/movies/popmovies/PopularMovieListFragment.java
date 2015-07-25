@@ -3,7 +3,6 @@ package com.divya.android.movies.popmovies;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -18,14 +17,8 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import retrofit.Callback;
+import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
@@ -39,71 +32,91 @@ public class PopularMovieListFragment extends Fragment {
     private GridView gridView;
     ImageAdapter imageAdapter;
     private SharedPreferences sharedPrefs;
-    List<MovieInfo> movieDetailsObj;
-    private RetainedAppData mRetainedAppData; //abcd
+    static final String MOVIES_BASE_URL ="http://api.themoviedb.org/3/discover/movie?";
     protected final String TAG = getClass().getSimpleName(); //abcd
 
     public PopularMovieListFragment() {
 
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        movieDetailsObj = new ArrayList<MovieInfo>();
-        updateMoviesList();
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        mRetainedAppData = new RetainedAppData(); //abcd
-        Log.d(TAG, "onCreate(): Creating new  data set");
-
-        //movieDetailsObj = new ArrayList<MovieInfo>();
-
         //Obtain the gridView ID . where rootView inflates the fragment_main.xml
         gridView = (GridView)rootView.findViewById(R.id.gridview);
-        imageAdapter = new ImageAdapter(getActivity());
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        //FetchMovieTask movieTask = new FetchMovieTask();
+       // movieTask.execute();
 
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        final String SORT_PARAM = "sort_by";
+        final String API_KEY = "api_key";
+
+        String sortBy = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
+        String api_key = "2fc475941d44b7da433d1f18e24e2551";
+
+        Log.v(TAG, "sortBy : "+ sortBy);
+
+        RestAdapter restAdapter = new RestAdapter.Builder()
+                .setEndpoint(MOVIES_BASE_URL)
+                .build();
+
+        GetMovieDataApi service = restAdapter.create(GetMovieDataApi.class);
+
+        service.getMovieDataFromApi(sortBy, api_key, new Callback<Results>() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                MovieInfo obj = (MovieInfo) imageAdapter.getItem(position);
-               Intent intent = new Intent(getActivity(), MovieDetail.class);
-                intent.putExtra("MovieInfo", obj);
-               startActivity(intent);
+            public void success(Results results, Response response) {
+                imageAdapter = new ImageAdapter(getActivity(), results);
+                imageAdapter.notifyDataSetChanged();
+                gridView.setAdapter(imageAdapter);
+                gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        MovieInfo obj = (MovieInfo) imageAdapter.getItem(position);
+                        Intent intent = new Intent(getActivity(), MovieDetail.class);
+                        intent.putExtra("MovieInfo", obj);
+                        startActivity(intent);
+                    }
+                });
+
+            }
+            @Override
+            public void failure(RetrofitError error) {
+                Log.d(TAG, "failure: " + error);
             }
         });
         return rootView;
     }
 
-    private void updateMoviesList() {
+  /*  private void updateMoviesList() {
         //This creates an AsyncTask FetchMovieTask() which runs in other thread than main thread.
         FetchMovieTask movieTask = new FetchMovieTask();
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         movieTask.execute();
-}
+}*/
 
     public class ImageAdapter extends BaseAdapter{
         private final String LOG_TAG = ImageAdapter.class.getSimpleName();
         private Context mContext;
+        private Results mResults;
         //Constructor which takes context as inputs
-    public ImageAdapter(Context context) {
+    public ImageAdapter(Context context, Results results) {
         mContext = context;
+        mResults = results;
     }
 
     @Override
     //return the no. of Views to be displayed
     public int getCount() {
-        return movieDetailsObj.size();
+        return mResults.getResults().size();
     }
 
     @Override
     public Object getItem(int position) {
-        return movieDetailsObj.get(position);
+        return mResults.getResults().get(position);
     }
 
     @Override
@@ -122,183 +135,12 @@ public class PopularMovieListFragment extends Fragment {
         //Picasso easily load album art thumbnails into your views ...
         //Picasso will handle loading the images on a background thread, image decompression and caching the images.
         //Fetches Images and load them into Views
-        Picasso.with(mContext).load(movieDetailsObj.get(position).getPoster_path()).into(view);
+        Picasso.with(mContext).load(mResults.getResults().get(position).getPosterPath()).into(view);
         return view;
     }
 
     }
 
-    //abcd
-    private class RetainedAppData {
-        private List<MovieInfo> mData;
-        private GetMovieDataRestAdapter mGetMovieDataRestAdapter; //REST Adapter
-        private Callback<List<MovieInfo>> mMovieInfoCallback = new Callback<List<MovieInfo>>() {
 
-            public void success(List<MovieInfo> data, Response response) {
-                for (int i = 0; i < data.size(); i++) {
-                    Log.d(TAG, "Async Success: MovieData: title:" + data.get(i).getOriginal_title() +
-                                    ", poster_path:" + data.get(i).getPoster_path() +
-                                    ", overview:" + data.get(i).getOverview() +
-                                    ", release_data:" + data.get(i).getRelease_date() +
-                                    ",vote_average:" + data.get(i).getVote_average()
-                    );
-
-                    mData.add(data.get(i));
-                }
-            }
-            @Override
-            public void failure(RetrofitError error) {
-                Log.d(TAG, "failure: " + error);
-            }
-        };
-
-        public void runRetrofitTest(final String sortBy, final String api_key){
-            if(mGetMovieDataRestAdapter == null){
-                mGetMovieDataRestAdapter = new GetMovieDataRestAdapter();
-            }
-            mGetMovieDataRestAdapter.testMovieDataApi(sortBy, api_key, mMovieInfoCallback);
-        }
-    }
-    public class FetchMovieTask extends AsyncTask<Void, Void, String[]> {
-
-
-        private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
-
-
-
-        private String[] getMovieDataFromJson(String movieJSONString)
-                throws JSONException{
-
-            // These are the names of the JSON objects that need to be extracted.
-            final String OWM_RESULTS = "results";
-            final String OWM_TITLE = "original_title";
-            final String OWM_IMAGEPATH= "poster_path";
-            final String OWM_OVERVIEW = "overview";
-            final String OWM_RELEASEDATE = "release_date";
-            final String OWM_USERRATING = "vote_average";
-
-
-            JSONObject movieJson = new JSONObject(movieJSONString);
-            JSONArray resultsArray = movieJson.getJSONArray(OWM_RESULTS);
-
-            int numMovies = resultsArray.length();
-            String[] resultImageStrs = new String[numMovies];
-
-            for(int i=0;i<numMovies;i++){
-
-                JSONObject res = resultsArray.getJSONObject(i);
-
-                resultImageStrs[i] = res.getString(OWM_IMAGEPATH);
-                movieDetailsObj.add(new MovieInfo((String)res.getString(OWM_TITLE),
-                        "http://image.tmdb.org/t/p/w185" + res.getString(OWM_IMAGEPATH),
-                                            res.getString(OWM_OVERVIEW),
-                                            res.getString(OWM_RELEASEDATE),
-                                            res.getDouble(OWM_USERRATING)));
-            }
-
-            return resultImageStrs;
-        }
-        @Override
-        protected String[] doInBackground(Void... params) {
-
-            //abcd
-           /* HttpURLConnection urlConnection = null;
-            BufferedReader reader = null;
-            String movieJSONString = null;
-
-            try{
-
-                final String MOVIES_BASE_URL ="http://api.themoviedb.org/3/discover/movie?";
-                final String SORT_PARAM = "sort_by";
-                final String API_KEY = "api_key";
-
-                String sortBy = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
-
-
-                Uri builtUri = Uri.parse(MOVIES_BASE_URL).buildUpon()
-                                .appendQueryParameter(SORT_PARAM,sortBy)
-                                .appendQueryParameter(API_KEY,"2fc475941d44b7da433d1f18e24e2551").build();
-
-                String myUri = builtUri.toString();
-
-               // Log.v(LOG_TAG,"URL :" + myUri);
-                URL url = new URL(myUri);
-
-                //Create the request to tmbdp and open the connection
-                urlConnection = (HttpURLConnection)url.openConnection();
-                urlConnection.setRequestMethod("GET");;
-                urlConnection.connect();
-
-                //Read the input stream into a String
-                InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
-
-                if(inputStream == null){
-                    return null;
-                }
-
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String line;
-                while((line=reader.readLine())!= null){
-                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                    // But it does make debugging a *lot* easier if you print out the completed
-                    // buffer for debugging.
-                    buffer.append(line + '\n');
-                }
-                if(buffer.length() == 0){
-                    return null;
-                }
-
-                movieJSONString = buffer.toString();
-                
-
-
-            }catch (IOException e){
-                // If the code didn't successfully get the weather data, there's no point in attemping
-                // to parse it.
-                Log.e(LOG_TAG, "Error", e);
-                return null;
-            }finally {
-                if (urlConnection != null)
-                    urlConnection.disconnect();
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        Log.e(LOG_TAG, "Error Closing Stream", e);
-                    }
-                }
-            }
-
-            try {
-                return getMovieDataFromJson(movieJSONString);
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
-                e.printStackTrace();
-            }*/ //abcd
-
-            //abcd
-
-            final String SORT_PARAM = "sort_by";
-            final String API_KEY = "api_key";
-
-            String sortBy = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
-            String api_key = "2fc475941d44b7da433d1f18e24e2551";
-
-            mRetainedAppData.runRetrofitTest(sortBy,api_key);
-
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String[] strings) {
-            super.onPostExecute(strings);
-            imageAdapter.notifyDataSetChanged();
-            gridView.setAdapter(imageAdapter);
-
-        }
-    }
 
 }

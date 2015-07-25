@@ -32,21 +32,21 @@ public class MovieDetailFragment extends Fragment {
         MovieInfo obj = data.getParcelable("MovieInfo");
 
         TextView movieTitle = (TextView)rootView.findViewById(R.id.movieTitle);
-        movieTitle.setText(obj.getOriginal_title());
+        movieTitle.setText(obj.getOriginalTitle());
 
         ImageView view = (ImageView)rootView.findViewById(R.id.posterPath);
-        Picasso.with(getActivity()).load(obj.getPoster_path()).into(view);
+        Picasso.with(getActivity()).load(obj.getPosterPath()).into(view);
 
 
         TextView releaseDate = (TextView)rootView.findViewById(R.id.releaseDate);
-        String str = obj.getRelease_date().substring(0,4);
+        String str = obj.getReleaseDate().substring(0,4);
         releaseDate.setText(str);
 
        // TextView duration = (TextView)rootView.findViewById(R.id.duration);
        // duration.setText(obj.get());
 
         TextView userRating = (TextView)rootView.findViewById(R.id.userRating);
-        userRating.setText(Double.toString(obj.getVote_average())+"/10");
+        userRating.setText(Double.toString(obj.getVoteAverage())+"/10");
 
         TextView overview = (TextView)rootView.findViewById(R.id.overview);
         overview.setText(obj.getOverview());
