@@ -1,4 +1,6 @@
-package com.divya.android.movies.popmovies;
+package com.divya.android.movies.popmovies.api;
+
+import com.divya.android.movies.popmovies.model.Results;
 
 import retrofit.Callback;
 import retrofit.http.GET;

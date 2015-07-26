@@ -1,4 +1,4 @@
-package com.divya.android.movies.popmovies;
+package com.divya.android.movies.popmovies.model;
 
 
 import android.os.Parcel;

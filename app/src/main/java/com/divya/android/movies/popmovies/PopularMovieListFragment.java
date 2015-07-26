@@ -15,10 +15,13 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.divya.android.movies.popmovies.api.ApiClient;
+import com.divya.android.movies.popmovies.api.GetMovieDataApi;
+import com.divya.android.movies.popmovies.model.MovieInfo;
+import com.divya.android.movies.popmovies.model.Results;
 import com.squareup.picasso.Picasso;
 
 import retrofit.Callback;
-import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
@@ -34,8 +37,8 @@ public class PopularMovieListFragment extends Fragment {
     private SharedPreferences sharedPrefs;
     static final String MOVIES_BASE_URL ="http://api.themoviedb.org/3";
     protected final String TAG = getClass().getSimpleName(); //abcd
-    RestAdapter restAdapter;
-    GetMovieDataApi service;
+    //RestAdapter restAdapter;
+    protected GetMovieDataApi service;
     final String SORT_PARAM = "sort_by";
     final String API_KEY = "api_key";
 
@@ -55,11 +58,11 @@ public class PopularMovieListFragment extends Fragment {
         Log.v(TAG, "updateMovieList() called");
         String sortBy = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
         String api_key = "2fc475941d44b7da433d1f18e24e2551";
-        restAdapter = new RestAdapter.Builder()
-                .setEndpoint(MOVIES_BASE_URL)
-                .build();
-
-        service = restAdapter.create(GetMovieDataApi.class);
+//        restAdapter = new RestAdapter.Builder()
+//                .setEndpoint(MOVIES_BASE_URL)
+//                .build();
+//
+//        service = restAdapter.create(GetMovieDataApi.class);
 
         service.getMovieDataFromApi(sortBy, api_key, new Callback<Results>() {
             @Override
@@ -88,13 +91,14 @@ public class PopularMovieListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
         Log.v(TAG,"onCreateView()");
 
         //Obtain the gridView ID . where rootView inflates the fragment_main.xml
         gridView = (GridView)rootView.findViewById(R.id.gridview);
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-
+        service = ApiClient.MovieDataApiInterface();
 
         return rootView;
     }
