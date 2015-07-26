@@ -32,39 +32,34 @@ public class PopularMovieListFragment extends Fragment {
     private GridView gridView;
     ImageAdapter imageAdapter;
     private SharedPreferences sharedPrefs;
-    static final String MOVIES_BASE_URL ="http://api.themoviedb.org/3/discover/movie?";
+    static final String MOVIES_BASE_URL ="http://api.themoviedb.org/3";
     protected final String TAG = getClass().getSimpleName(); //abcd
+    RestAdapter restAdapter;
+    GetMovieDataApi service;
+    final String SORT_PARAM = "sort_by";
+    final String API_KEY = "api_key";
 
     public PopularMovieListFragment() {
 
     }
 
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+    public void onStart() {
+        super.onStart();
+        Log.v(TAG,"onStart()");
+        updateMovieList();
+    }
 
-        //Obtain the gridView ID . where rootView inflates the fragment_main.xml
-        gridView = (GridView)rootView.findViewById(R.id.gridview);
-        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        //FetchMovieTask movieTask = new FetchMovieTask();
-       // movieTask.execute();
+    private void updateMovieList(){
 
-        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        final String SORT_PARAM = "sort_by";
-        final String API_KEY = "api_key";
-
+        Log.v(TAG, "updateMovieList() called");
         String sortBy = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
         String api_key = "2fc475941d44b7da433d1f18e24e2551";
-
-        Log.v(TAG, "sortBy : "+ sortBy);
-
-        RestAdapter restAdapter = new RestAdapter.Builder()
+        restAdapter = new RestAdapter.Builder()
                 .setEndpoint(MOVIES_BASE_URL)
                 .build();
 
-        GetMovieDataApi service = restAdapter.create(GetMovieDataApi.class);
+        service = restAdapter.create(GetMovieDataApi.class);
 
         service.getMovieDataFromApi(sortBy, api_key, new Callback<Results>() {
             @Override
@@ -88,15 +83,21 @@ public class PopularMovieListFragment extends Fragment {
                 Log.d(TAG, "failure: " + error);
             }
         });
+    }
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        Log.v(TAG,"onCreateView()");
+
+        //Obtain the gridView ID . where rootView inflates the fragment_main.xml
+        gridView = (GridView)rootView.findViewById(R.id.gridview);
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+
+
         return rootView;
     }
-
-  /*  private void updateMoviesList() {
-        //This creates an AsyncTask FetchMovieTask() which runs in other thread than main thread.
-        FetchMovieTask movieTask = new FetchMovieTask();
-        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        movieTask.execute();
-}*/
 
     public class ImageAdapter extends BaseAdapter{
         private final String LOG_TAG = ImageAdapter.class.getSimpleName();
