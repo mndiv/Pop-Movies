@@ -95,7 +95,6 @@ public class MovieInfo implements Parcelable{
     //Parcelling Part
     public MovieInfo(Parcel in){
         String[] data = new String[5];
-        double rating;
 
         in.readStringArray(data);
         this.originalTitle = data[0];

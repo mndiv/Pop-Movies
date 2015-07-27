@@ -58,11 +58,7 @@ public class PopularMovieListFragment extends Fragment {
         Log.v(TAG, "updateMovieList() called");
         String sortBy = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
         String api_key = "2fc475941d44b7da433d1f18e24e2551";
-//        restAdapter = new RestAdapter.Builder()
-//                .setEndpoint(MOVIES_BASE_URL)
-//                .build();
-//
-//        service = restAdapter.create(GetMovieDataApi.class);
+
 
         service.getMovieDataFromApi(sortBy, api_key, new Callback<Results>() {
             @Override
