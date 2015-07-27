@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class Results {
 
-    //page
+
     @SerializedName("page")
     @Expose
     private String page;
