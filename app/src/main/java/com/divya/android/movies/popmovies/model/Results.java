@@ -13,10 +13,6 @@ import java.util.Map;
  */
 public class Results {
 
-
-    @SerializedName("page")
-    @Expose
-    private String page;
     @SerializedName("results")
     @Expose
     private List<MovieInfo> results = new ArrayList<MovieInfo>();
