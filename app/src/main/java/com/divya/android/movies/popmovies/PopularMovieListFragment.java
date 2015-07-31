@@ -36,8 +36,7 @@ public class PopularMovieListFragment extends Fragment {
     ImageAdapter imageAdapter;
     private SharedPreferences sharedPrefs;
     static final String MOVIES_BASE_URL ="http://api.themoviedb.org/3";
-    protected final String TAG = getClass().getSimpleName(); //abcd
-    //RestAdapter restAdapter;
+    protected final String TAG = getClass().getSimpleName();
     protected GetMovieDataApi service;
     final String SORT_PARAM = "sort_by";
     final String API_KEY = "api_key";
@@ -50,8 +49,8 @@ public class PopularMovieListFragment extends Fragment {
         listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-               // String sortBy = sharedPrefs.getString(key,getString(R.string.pref_sortby_default));
-               // Log.v(TAG,"Preference change for: " +sortBy);
+                //String sortBy = sharedPrefs.getString(key,getString(R.string.pref_sortby_default));
+                //Log.v(TAG,"Preference change for: ");
                 updateMovieList();
 
             }
@@ -60,10 +59,8 @@ public class PopularMovieListFragment extends Fragment {
 
     }
 
-
     private void updateMovieList(){
-
-       // Log.v(TAG, "updateMovieList() called");
+        //Log.v(TAG, "updateMovieList() called");
         String sortBy = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
         String api_key = "2fc475941d44b7da433d1f18e24e2551";
 
@@ -83,7 +80,6 @@ public class PopularMovieListFragment extends Fragment {
                         startActivity(intent);
                     }
                 });
-
             }
 
             @Override
@@ -99,7 +95,7 @@ public class PopularMovieListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        Log.v(TAG,"onCreateView()");
+       // Log.v(TAG,"onCreateView()");
 
         //Obtain the gridView ID . where rootView inflates the fragment_main.xml
         gridView = (GridView)rootView.findViewById(R.id.gridview);
@@ -107,7 +103,15 @@ public class PopularMovieListFragment extends Fragment {
         service = ApiClient.MovieDataApiInterface();
         updateMovieList();
         registerPreferenceListener();
+
         return rootView;
+    }
+
+    @Override
+    public void onDestroy() {
+        //Log.v(TAG,"onDestroy() is called");
+        sharedPrefs.unregisterOnSharedPreferenceChangeListener(listener);
+        super.onDestroy();
     }
 
     public class ImageAdapter extends BaseAdapter{
@@ -150,9 +154,5 @@ public class PopularMovieListFragment extends Fragment {
         Picasso.with(mContext).load(mResults.getResults().get(position).getPosterPath()).into(view);
         return view;
     }
-
     }
-
-
-
 }
