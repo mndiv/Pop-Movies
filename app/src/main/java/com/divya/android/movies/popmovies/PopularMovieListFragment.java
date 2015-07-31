@@ -41,21 +41,29 @@ public class PopularMovieListFragment extends Fragment {
     protected GetMovieDataApi service;
     final String SORT_PARAM = "sort_by";
     final String API_KEY = "api_key";
+    SharedPreferences.OnSharedPreferenceChangeListener listener;
 
     public PopularMovieListFragment() {
 
     }
+    private void registerPreferenceListener() {
+        listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+               // String sortBy = sharedPrefs.getString(key,getString(R.string.pref_sortby_default));
+               // Log.v(TAG,"Preference change for: " +sortBy);
+                updateMovieList();
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        Log.v(TAG,"onStart()");
-        updateMovieList();
+            }
+        };
+        sharedPrefs.registerOnSharedPreferenceChangeListener(listener);
+
     }
+
 
     private void updateMovieList(){
 
-        Log.v(TAG, "updateMovieList() called");
+       // Log.v(TAG, "updateMovieList() called");
         String sortBy = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
         String api_key = "2fc475941d44b7da433d1f18e24e2551";
 
@@ -77,12 +85,15 @@ public class PopularMovieListFragment extends Fragment {
                 });
 
             }
+
             @Override
             public void failure(RetrofitError error) {
                 Log.d(TAG, "failure: " + error);
             }
         });
     }
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -93,9 +104,9 @@ public class PopularMovieListFragment extends Fragment {
         //Obtain the gridView ID . where rootView inflates the fragment_main.xml
         gridView = (GridView)rootView.findViewById(R.id.gridview);
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
         service = ApiClient.MovieDataApiInterface();
-
+        updateMovieList();
+        registerPreferenceListener();
         return rootView;
     }
 
