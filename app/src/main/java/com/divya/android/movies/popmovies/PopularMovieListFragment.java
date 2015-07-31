@@ -41,6 +41,7 @@ public class PopularMovieListFragment extends Fragment {
     final String SORT_PARAM = "sort_by";
     final String API_KEY = "api_key";
     SharedPreferences.OnSharedPreferenceChangeListener listener;
+    Results res;
 
     public PopularMovieListFragment() {
 
@@ -63,11 +64,13 @@ public class PopularMovieListFragment extends Fragment {
         //Log.v(TAG, "updateMovieList() called");
         String sortBy = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
         String api_key = "2fc475941d44b7da433d1f18e24e2551";
+        //String api_key = ; /*Please use your own api_key for moviedb*/
 
 
         service.getMovieDataFromApi(sortBy, api_key, new Callback<Results>() {
             @Override
             public void success(Results results, Response response) {
+                res = results;
                 imageAdapter = new ImageAdapter(getActivity(), results);
                 imageAdapter.notifyDataSetChanged();
                 gridView.setAdapter(imageAdapter);
@@ -94,17 +97,29 @@ public class PopularMovieListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        gridView = (GridView)rootView.findViewById(R.id.gridview);
+        if(savedInstanceState != null){
+            res = savedInstanceState.getParcelable("KEY_RESULTS_LIST");
+            imageAdapter = new ImageAdapter(getActivity(),res);
+            gridView.setAdapter(imageAdapter);
+        }
 
        // Log.v(TAG,"onCreateView()");
 
         //Obtain the gridView ID . where rootView inflates the fragment_main.xml
-        gridView = (GridView)rootView.findViewById(R.id.gridview);
+
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         service = ApiClient.MovieDataApiInterface();
         updateMovieList();
         registerPreferenceListener();
 
         return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable("KEY_RESULTS_LIST", res);
+        super.onSaveInstanceState(outState);
     }
 
     @Override

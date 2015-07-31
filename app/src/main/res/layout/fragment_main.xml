@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id = "@+id/gridview"
-        android:columnWidth="90dp"
+        android:columnWidth="130dp"
         android:numColumns="auto_fit"
         android:stretchMode="columnWidth"
         android:gravity="center">
