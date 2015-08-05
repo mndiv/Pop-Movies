@@ -1,9 +1,11 @@
 package com.divya.android.movies.popmovies.api;
 
+import com.divya.android.movies.popmovies.model.ResultVideos;
 import com.divya.android.movies.popmovies.model.Results;
 
 import retrofit.Callback;
 import retrofit.http.GET;
+import retrofit.http.Path;
 import retrofit.http.Query;
 
 /**
@@ -15,4 +17,10 @@ public interface GetMovieDataApi {
             @Query("sort_by") String sortBy,
             @Query("api_key") String apiKey,
             Callback<Results> callback);
+
+    @GET("/movie/{id}/videos")
+    void getMovieTrailersFromApi( @Path("id") int videoId,
+            @Query("api_key") String apiKey,
+            Callback<ResultVideos> callback);
+
 }

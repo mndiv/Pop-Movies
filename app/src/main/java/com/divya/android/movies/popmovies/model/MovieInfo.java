@@ -13,6 +13,12 @@ import java.util.Map;
 //New class is defined to hold the Movie Data
 public class MovieInfo implements Parcelable{
 
+    @SerializedName("id")
+    @Expose
+    private String id;
+
+
+
     @SerializedName("original_title")
     @Expose
     private String originalTitle;
@@ -34,6 +40,10 @@ public class MovieInfo implements Parcelable{
     private double voteAverage;
 
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+
+    public String getId() { return id;  }
+
+    public void setId(String id) {  this.id = id; }
 
     public String getOriginalTitle() {
         return originalTitle;
@@ -84,24 +94,29 @@ public class MovieInfo implements Parcelable{
     }
 
 
-    public MovieInfo(String movieTitle, String posterImage, String overView, String releaseDate, double userRating) {
+    public MovieInfo(String movieTitle, String posterImg, String overView,
+                     String releaseDt, double userRating,
+                     String movieId) {
         originalTitle = movieTitle;
-        posterImage = posterImage;
+        posterPath = posterImg;
         overview = overView;
         voteAverage = userRating;
-        releaseDate = releaseDate;
+        releaseDate = releaseDt;
+        id = movieId;
+
     }
 
     //Parcelling Part
     public MovieInfo(Parcel in){
-        String[] data = new String[5];
+        String[] data = new String[6];
 
         in.readStringArray(data);
-        this.originalTitle = data[0];
-        this.posterPath = data[1];
-        this.overview = data[2];
-        this.releaseDate = data[3];
-        this.voteAverage = Double.parseDouble(data[4]);
+        this.id = data[0];
+        this.originalTitle = data[1];
+        this.posterPath = data[2];
+        this.overview = data[3];
+        this.releaseDate = data[4];
+        this.voteAverage = Double.parseDouble(data[5]);
     }
     @Override
     public int describeContents() {
@@ -110,7 +125,8 @@ public class MovieInfo implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeStringArray(new String[]{this.originalTitle,
+        dest.writeStringArray(new String[]{this.id,
+                                            this.originalTitle,
                                             this.posterPath,
                                             this.overview,
                                             this.releaseDate,

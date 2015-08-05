@@ -78,6 +78,7 @@ public class PopularMovieListFragment extends Fragment {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         MovieInfo obj = (MovieInfo) imageAdapter.getItem(position);
+                        Log.d(TAG,"id: " +obj.getId());
                         Intent intent = new Intent(getActivity(), MovieDetail.class);
                         intent.putExtra("MovieInfo", obj);
                         startActivity(intent);
@@ -160,7 +161,7 @@ public class PopularMovieListFragment extends Fragment {
         ImageView view = (ImageView) convertView;
         if (view == null) {
             view = new ImageView(mContext);
-            view.setLayoutParams(new GridView.LayoutParams(220, 220));
+            view.setLayoutParams(new GridView.LayoutParams(300, 300));
         }
 
         //Picasso easily load album art thumbnails into your views ...

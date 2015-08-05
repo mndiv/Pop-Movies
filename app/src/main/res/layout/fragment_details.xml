@@ -102,10 +102,11 @@
         <ImageButton
             android:layout_width="61dp"
             android:layout_height="69dp"
-            android:src="@drawable/play_2"
+            android:src="@drawable/image1"
             android:layout_marginLeft="50dp"
             android:cropToPadding="false"
-            android:scaleType="centerCrop"/>
+            android:scaleType="centerCrop"
+            android:id = "@+id/button1"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -113,7 +114,8 @@
             android:textSize="25sp"
             android:gravity="center_vertical|center_horizontal"
             android:paddingLeft="50dp"
-            android:paddingTop="25dp"/>
+            android:paddingTop="25dp"
+            android:id="@+id/trailer1"/>
     </LinearLayout>
 
     <View
