@@ -1,11 +1,15 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/activity_vertical_margin">
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation = "vertical"
                 tools:context="com.divya.android.movies.popmovies.MovieDetailFragment">
 
@@ -25,7 +29,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="5dp">
+        android:layout_marginTop="5dp"
+        android:layout_below="@+id/movieTitle"
+        android:id="@+id/movieInfo">
 
     <ImageView
         android:id="@+id/posterPath"
@@ -77,7 +83,8 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/overview"/>
+        android:id="@+id/overview"
+        android:layout_below="@+id/movieInfo"/>
 
     <View
         android:layout_width="fill_parent"
@@ -86,37 +93,28 @@
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:paddingBottom="5dp"
-        android:paddingTop="5dp"/>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/trailers"
-        android:textSize="25sp"/>
+        android:paddingTop="5dp"
+        android:layout_below="@+id/overview"
+        android:id="@+id/divider"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="1">
-        <ImageButton
-            android:layout_width="61dp"
-            android:layout_height="69dp"
-            android:src="@drawable/image1"
-            android:layout_marginLeft="50dp"
-            android:cropToPadding="false"
-            android:scaleType="centerCrop"
-            android:id = "@+id/button1"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/trailer1"
-            android:textSize="25sp"
-            android:gravity="center_vertical|center_horizontal"
-            android:paddingLeft="50dp"
-            android:paddingTop="25dp"
-            android:id="@+id/trailer1"/>
-    </LinearLayout>
+        android:orientation="vertical"
+        android:layout_below="@+id/divider"
+        android:id="@+id/divider2">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/trailers"
+        android:textSize="25sp"
+        android:id="@+id/text_trailers"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/trailersList"
+        android:layout_width = "match_parent"
+        android:layout_height = "150dp"
+        android.layout_below = "@+id/text_trailers" />
 
     <View
         android:layout_width="fill_parent"
@@ -125,27 +123,29 @@
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:paddingBottom="10dp"
-        android:paddingTop="10dp"/>
+        android:paddingTop="10dp"
+        />
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="1">
-        <ImageButton
-            android:layout_width="61dp"
-            android:layout_height="69dp"
-            android:src="@drawable/play_2"
-            android:layout_marginLeft="50dp"
-            android:cropToPadding="false"
-            android:scaleType="centerCrop"/>
+        android:orientation="vertical"
+        android:layout_below="@+id/divider2">
         <TextView
-            android:layout_width="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/reviews"
+        android:textSize="25sp"
+        android:id="@+id/text_reviews"/>
+
+        <TextView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/trailer2"
-            android:textSize="25sp"
-            android:gravity="center_vertical|center_horizontal"
-            android:paddingLeft="50dp"
-            android:paddingTop="25dp"/>
+             android:layout_below="@+id/text_reviews"
+            android:id="@+id/reviews"/>
+
+
     </LinearLayout>
-</LinearLayout>
+</RelativeLayout>
 </ScrollView>

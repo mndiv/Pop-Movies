@@ -1,0 +1,41 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              xmlns:card_view="http://schemas.android.com/apk/res-auto"
+              android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+    >
+    <!-- A CardView that contains a TextView -->
+    <android.support.v7.widget.CardView
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/card_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        card_view:cardCornerRadius="4dp"
+        android:background="#000000">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+            <ImageView
+                android:layout_width = "wrap_content"
+                android:layout_height = "wrap_content"
+                android:id="@+id/trailer_key"
+                android:layout_alignParentLeft = "true"
+                android:layout_alignParentTop = "true"
+                android:layout_marginRight="16dp"
+                />
+
+            <TextView
+                android:id="@+id/info_text"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_below = "@+id/trailer_key"
+                android:textSize="16sp"
+                android:ellipsize="none"
+                android:singleLine="false"
+                android:minLines = "2"/>
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+
+    </LinearLayout>

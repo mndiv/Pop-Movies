@@ -42,49 +42,37 @@ public class MovieInfo implements Parcelable{
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     public String getId() { return id;  }
-
     public void setId(String id) {  this.id = id; }
-
     public String getOriginalTitle() {
         return originalTitle;
     }
-
     public void setOriginalTitle(String originalTitle) {
         this.originalTitle = originalTitle;
     }
-
     public String getOverview() {
         return overview;
     }
-
     public void setOverview(String overview) {
         this.overview = overview;
     }
-
     public String getReleaseDate() {
         return releaseDate;
     }
-
     public void setReleaseDate(String releaseDate) {
         this.releaseDate = releaseDate;
     }
-
     public String getPosterPath() {
         return ("http://image.tmdb.org/t/p/w185" +posterPath);
     }
-
     public void setPosterPath(String posterPath) {
         this.posterPath = posterPath;
     }
-
     public double getVoteAverage() {
         return voteAverage;
     }
-
     public void setVoteAverage(double voteAverage) {
         this.voteAverage = voteAverage;
     }
-
     public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;
     }

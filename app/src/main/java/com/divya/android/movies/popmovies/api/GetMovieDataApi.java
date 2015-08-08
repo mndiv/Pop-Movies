@@ -1,5 +1,6 @@
 package com.divya.android.movies.popmovies.api;
 
+import com.divya.android.movies.popmovies.model.ResultReviews;
 import com.divya.android.movies.popmovies.model.ResultVideos;
 import com.divya.android.movies.popmovies.model.Results;
 
@@ -22,5 +23,10 @@ public interface GetMovieDataApi {
     void getMovieTrailersFromApi( @Path("id") int videoId,
             @Query("api_key") String apiKey,
             Callback<ResultVideos> callback);
+
+    @GET("/movie/{id}/reviews")
+    void getMovieReviewsFromApi( @Path("id") int videoId,
+                                  @Query("api_key") String apiKey,
+                                  Callback<ResultReviews> callback);
 
 }

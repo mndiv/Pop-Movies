@@ -29,4 +29,14 @@ public class ApiClient {
         }
         return service;
     }
+
+    public  static GetMovieDataApi ReviewDataApiInterface(){
+        if(service == null){
+            RestAdapter restAdapter= new RestAdapter.Builder()
+                    .setEndpoint(MOVIES_BASE_URL)
+                    .build();
+            service = restAdapter.create(GetMovieDataApi.class);
+        }
+        return service;
+    }
 }
