@@ -21,7 +21,8 @@
         <activity
             android:name=".MovieDetail"
             android:label="@string/title_activity_details"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.WithoutActionBar" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.divya.android.movies.popmovies.MainActivity" />

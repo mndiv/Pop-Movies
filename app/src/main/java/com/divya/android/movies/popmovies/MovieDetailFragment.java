@@ -3,8 +3,12 @@ package com.divya.android.movies.popmovies;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -34,6 +38,9 @@ public class MovieDetailFragment extends Fragment {
     static final String MOVIES_BASE_URL = "http://api.themoviedb.org/3";
     protected final String TAG = getClass().getSimpleName();
     Toolbar toolbar;
+    CollapsingToolbarLayout collapsingToolbarLayout;
+    CoordinatorLayout rootLayout;
+    FloatingActionButton fabBtn;
 
 
     private String mPosterPath;
@@ -159,13 +166,15 @@ public class MovieDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_details, container, false);
         //initToolbar();
+        toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
 
         Intent intent = getActivity().getIntent();
 
         Bundle data = intent.getExtras();
         MovieInfo obj = data.getParcelable("MovieInfo");
 
-        TextView movieTitle = (TextView) rootView.findViewById(R.id.movieTitle);
+      /*  TextView movieTitle = (TextView) rootView.findViewById(R.id.movieTitle);
         movieTitle.setText(obj.getOriginalTitle());
 
         ImageView view = (ImageView) rootView.findViewById(R.id.posterPath);
@@ -197,7 +206,27 @@ public class MovieDetailFragment extends Fragment {
 
         reviews = (TextView) rootView.findViewById(R.id.reviews);
 
-        GetReviews(obj.getId());
+        GetReviews(obj.getId());*/
+
+        rootLayout = (CoordinatorLayout) rootView.findViewById(R.id.rootLayout);
+        collapsingToolbarLayout = (CollapsingToolbarLayout) rootView.findViewById(R.id.collapsingToolbarLayout);
+        collapsingToolbarLayout.setTitle("Design Library");
+
+        fabBtn = (FloatingActionButton) rootView.findViewById(R.id.fabBtn);
+        fabBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Snackbar.make(rootLayout, "Hello. I am Snackbar!", Snackbar.LENGTH_SHORT)
+                        .setAction("Undo", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+
+                            }
+                        })
+                        .show();
+            }
+        });
+
         return rootView;
     }
 

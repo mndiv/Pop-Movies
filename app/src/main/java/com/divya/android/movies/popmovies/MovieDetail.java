@@ -1,5 +1,7 @@
 package com.divya.android.movies.popmovies;
 
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -8,10 +10,12 @@ import android.view.MenuItem;
 
 public class MovieDetail extends AppCompatActivity {
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
+        //getActionBar().setDisplayShowTitleEnabled(false);
     }
 
 
