@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,8 +31,9 @@ import retrofit.client.Response;
  */
 public class MovieDetailFragment extends Fragment {
 
-    static final String MOVIES_BASE_URL ="http://api.themoviedb.org/3";
+    static final String MOVIES_BASE_URL = "http://api.themoviedb.org/3";
     protected final String TAG = getClass().getSimpleName();
+    Toolbar toolbar;
 
 
     private String mPosterPath;
@@ -46,8 +48,7 @@ public class MovieDetailFragment extends Fragment {
     }
 
 
-   // ResultVideos trailers;
-    public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TrailerViewHolder>{
+    public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TrailerViewHolder> {
         ResultVideos trailers;
 
         public RVAdapter(ResultVideos trailers) {
@@ -55,13 +56,9 @@ public class MovieDetailFragment extends Fragment {
         }
 
 
-
-        public class TrailerViewHolder extends RecyclerView.ViewHolder{
-           // CardView mCardView;
-             ImageView trailerKey;
+        public class TrailerViewHolder extends RecyclerView.ViewHolder {
+            ImageView trailerKey;
             TextView trailerName;
-
-            ///ResultVideos trailers;
 
 
             public TrailerViewHolder(View itemView) {
@@ -79,12 +76,14 @@ public class MovieDetailFragment extends Fragment {
             return pvh;
         }
 
+
         @Override
         public void onBindViewHolder(TrailerViewHolder trailerViewHolder, int i) {
-            trailerViewHolder.trailerKey.setImageResource(R.drawable.image1);
-            trailerViewHolder.trailerName.setText(trailers.getResults().get(i).getName());
-
             final String key = trailers.getResults().get(i).getKey();
+            String path = "http://img.youtube.com/vi/" + key + "/mqdefault.jpg";
+            Picasso.with(getActivity()).load(path).into(trailerViewHolder.trailerKey);
+
+            trailerViewHolder.trailerName.setText(trailers.getResults().get(i).getName());
             trailerViewHolder.trailerKey.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -98,6 +97,7 @@ public class MovieDetailFragment extends Fragment {
         public int getItemCount() {
             return trailers.getResults().size();
         }
+
         @Override
 
         public void onAttachedToRecyclerView(RecyclerView recyclerView) {
@@ -105,12 +105,12 @@ public class MovieDetailFragment extends Fragment {
         }
     }
 
-    public void GetTrailers(String id){
+    public void GetTrailers(String id) {
         GetMovieDataApi videoService;
         int videoId = Integer.parseInt(id);
 
         videoService = ApiClient.TrailerDataApiInterface();
-        videoService.getMovieTrailersFromApi(videoId,api_key, new Callback<ResultVideos>() {
+        videoService.getMovieTrailersFromApi(videoId, api_key, new Callback<ResultVideos>() {
             @Override
             public void success(final ResultVideos resultVideos, Response response) {
                 Log.d(TAG, "No. of Trailers : " + resultVideos.getResults().size());
@@ -125,7 +125,7 @@ public class MovieDetailFragment extends Fragment {
         });
     }
 
-    public void GetReviews(final String id){
+    public void GetReviews(final String id) {
         GetMovieDataApi reviewService;
         int videoId = Integer.parseInt(id);
 
@@ -134,14 +134,14 @@ public class MovieDetailFragment extends Fragment {
             @Override
             public void success(ResultReviews resultReviews, Response response) {
                 String review = "";
-                for(int i = 0;i<resultReviews.getResults().size();i++) {
+                for (int i = 0; i < resultReviews.getResults().size(); i++) {
 
                     Log.d(TAG, "author:" + resultReviews.getResults().get(i).getAuthor());
 
-                    review += resultReviews.getResults().get(i).getAuthor()+"\n\n" +
-                            resultReviews.getResults().get(i).getContent()+"\n\n";
+                    review += resultReviews.getResults().get(i).getAuthor() + "\n\n" +
+                            resultReviews.getResults().get(i).getContent() + "\n\n";
                 }
-                if(review != "")
+                if (review != "")
                     reviews.setText(review);
                 else
                     reviews.setText("No Reviews");
@@ -153,38 +153,40 @@ public class MovieDetailFragment extends Fragment {
             }
         });
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView =  inflater.inflate(R.layout.fragment_details, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_details, container, false);
+        //initToolbar();
 
         Intent intent = getActivity().getIntent();
 
         Bundle data = intent.getExtras();
         MovieInfo obj = data.getParcelable("MovieInfo");
 
-        TextView movieTitle = (TextView)rootView.findViewById(R.id.movieTitle);
+        TextView movieTitle = (TextView) rootView.findViewById(R.id.movieTitle);
         movieTitle.setText(obj.getOriginalTitle());
 
-        ImageView view = (ImageView)rootView.findViewById(R.id.posterPath);
+        ImageView view = (ImageView) rootView.findViewById(R.id.posterPath);
         Picasso.with(getActivity()).load(obj.getPosterPath()).into(view);
 
 
-        TextView releaseDate = (TextView)rootView.findViewById(R.id.releaseDate);
-        String str = obj.getReleaseDate().substring(0,4);
+        TextView releaseDate = (TextView) rootView.findViewById(R.id.releaseDate);
+        String str = obj.getReleaseDate().substring(0, 4);
         releaseDate.setText(str);
 
-       // TextView duration = (TextView)rootView.findViewById(R.id.duration);
-       // duration.setText(obj.get());
+        // TextView duration = (TextView)rootView.findViewById(R.id.duration);
+        // duration.setText(obj.get());
 
-        TextView userRating = (TextView)rootView.findViewById(R.id.userRating);
+        TextView userRating = (TextView) rootView.findViewById(R.id.userRating);
         userRating.setText(Double.toString(obj.getVoteAverage()) + "/10");
 
-        TextView overview = (TextView)rootView.findViewById(R.id.overview);
+        TextView overview = (TextView) rootView.findViewById(R.id.overview);
         overview.setText(obj.getOverview());
 
         //Videos List
-        recList = (RecyclerView)rootView.findViewById(R.id.trailersList);
+        recList = (RecyclerView) rootView.findViewById(R.id.trailersList);
         recList.setHasFixedSize(true);
 
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
@@ -198,4 +200,9 @@ public class MovieDetailFragment extends Fragment {
         GetReviews(obj.getId());
         return rootView;
     }
+
+   /* private void initToolbar() {
+        toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+    }*/
 }
