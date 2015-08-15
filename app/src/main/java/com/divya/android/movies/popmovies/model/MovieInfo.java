@@ -13,12 +13,13 @@ import java.util.Map;
 //New class is defined to hold the Movie Data
 public class MovieInfo implements Parcelable{
 
+    @SerializedName("backdrop_path")
+    @Expose
+    private String backdropPath;
+
     @SerializedName("id")
     @Expose
     private String id;
-
-
-
     @SerializedName("original_title")
     @Expose
     private String originalTitle;
@@ -41,6 +42,8 @@ public class MovieInfo implements Parcelable{
 
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
+    public String getBackdropPath() { return ("http://image.tmdb.org/t/p/w500" + backdropPath);  }
+    public void setBackdropPath(String backdropPath) {  this.backdropPath = backdropPath; }
     public String getId() { return id;  }
     public void setId(String id) {  this.id = id; }
     public String getOriginalTitle() {
@@ -84,27 +87,29 @@ public class MovieInfo implements Parcelable{
 
     public MovieInfo(String movieTitle, String posterImg, String overView,
                      String releaseDt, double userRating,
-                     String movieId) {
+                     String movieId,String backdropImg) {
         originalTitle = movieTitle;
         posterPath = posterImg;
         overview = overView;
         voteAverage = userRating;
         releaseDate = releaseDt;
         id = movieId;
+        backdropPath = backdropImg;
 
     }
 
     //Parcelling Part
     public MovieInfo(Parcel in){
-        String[] data = new String[6];
+        String[] data = new String[7];
 
         in.readStringArray(data);
-        this.id = data[0];
-        this.originalTitle = data[1];
-        this.posterPath = data[2];
-        this.overview = data[3];
-        this.releaseDate = data[4];
-        this.voteAverage = Double.parseDouble(data[5]);
+        this.backdropPath = data[0];
+        this.id = data[1];
+        this.originalTitle = data[2];
+        this.posterPath = data[3];
+        this.overview = data[4];
+        this.releaseDate = data[5];
+        this.voteAverage = Double.parseDouble(data[6]);
     }
     @Override
     public int describeContents() {
@@ -113,7 +118,8 @@ public class MovieInfo implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeStringArray(new String[]{this.id,
+        dest.writeStringArray(new String[]{this.backdropPath,
+                                            this.id,
                                             this.originalTitle,
                                             this.posterPath,
                                             this.overview,

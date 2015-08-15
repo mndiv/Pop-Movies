@@ -78,7 +78,7 @@ public class PopularMovieListFragment extends Fragment {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         MovieInfo obj = (MovieInfo) imageAdapter.getItem(position);
-                        Log.d(TAG,"id: " +obj.getId());
+                        Log.d(TAG,"id: " +obj.getBackdropPath());
                         Intent intent = new Intent(getActivity(), MovieDetail.class);
                         intent.putExtra("MovieInfo", obj);
                         startActivity(intent);

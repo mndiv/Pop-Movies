@@ -9,6 +9,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -174,8 +175,31 @@ public class MovieDetailFragment extends Fragment {
         Bundle data = intent.getExtras();
         MovieInfo obj = data.getParcelable("MovieInfo");
 
-      /*  TextView movieTitle = (TextView) rootView.findViewById(R.id.movieTitle);
-        movieTitle.setText(obj.getOriginalTitle());
+        rootLayout = (CoordinatorLayout) rootView.findViewById(R.id.rootLayout);
+        collapsingToolbarLayout = (CollapsingToolbarLayout) rootView.findViewById(R.id.collapsingToolbarLayout);
+        collapsingToolbarLayout.setTitle(obj.getOriginalTitle());
+        fabBtn = (FloatingActionButton) rootView.findViewById(R.id.fabBtn);
+        fabBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Snackbar.make(rootLayout, "Hello. I am Snackbar!", Snackbar.LENGTH_SHORT)
+                        .setAction("Undo", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+
+                            }
+                        })
+                        .show();
+            }
+        });
+        ImageView backdropView = (ImageView)rootView.findViewById(R.id.backdrop_view);
+        Picasso.with(getActivity()).load(obj.getBackdropPath()).into(backdropView);
+
+
+        //backdropView.setImageBitmap(obj.getBackdropPath());
+
+     //   TextView movieTitle = (TextView) rootView.findViewById(R.id.movieTitle);
+     //   movieTitle.setText(obj.getOriginalTitle());
 
         ImageView view = (ImageView) rootView.findViewById(R.id.posterPath);
         Picasso.with(getActivity()).load(obj.getPosterPath()).into(view);
@@ -206,26 +230,9 @@ public class MovieDetailFragment extends Fragment {
 
         reviews = (TextView) rootView.findViewById(R.id.reviews);
 
-        GetReviews(obj.getId());*/
+        GetReviews(obj.getId());
 
-        rootLayout = (CoordinatorLayout) rootView.findViewById(R.id.rootLayout);
-        collapsingToolbarLayout = (CollapsingToolbarLayout) rootView.findViewById(R.id.collapsingToolbarLayout);
-        collapsingToolbarLayout.setTitle("Design Library");
 
-        fabBtn = (FloatingActionButton) rootView.findViewById(R.id.fabBtn);
-        fabBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Snackbar.make(rootLayout, "Hello. I am Snackbar!", Snackbar.LENGTH_SHORT)
-                        .setAction("Undo", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-
-                            }
-                        })
-                        .show();
-            }
-        });
 
         return rootView;
     }
