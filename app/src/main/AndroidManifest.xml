@@ -17,6 +17,8 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+
         </activity>
         <activity
             android:name=".MovieDetail"
@@ -36,6 +38,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.divya.android.movies.popmovies.MainActivity" />
         </activity>
+
+        <provider
+            android:name=".data.MovieProvider"
+            android:authorities="com.divya.android.movies.popmovies">
+        </provider>
     </application>
 
 </manifest>

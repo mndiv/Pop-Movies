@@ -1,8 +1,12 @@
 package com.divya.android.movies.popmovies;
 
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -17,9 +21,13 @@ import android.widget.ImageView;
 
 import com.divya.android.movies.popmovies.api.ApiClient;
 import com.divya.android.movies.popmovies.api.GetMovieDataApi;
+import com.divya.android.movies.popmovies.data.MovieContract;
+import com.divya.android.movies.popmovies.data.MovieContract.MovieEntry;
 import com.divya.android.movies.popmovies.model.MovieInfo;
 import com.divya.android.movies.popmovies.model.Results;
 import com.squareup.picasso.Picasso;
+
+import java.util.Vector;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -60,6 +68,51 @@ public class PopularMovieListFragment extends Fragment {
 
     }
 
+    long addMovie(String backdropPath, String id, String originalTitle,
+                  String posterPath, String overview, String releaseDate,
+                  double voteAverage) {
+        long movieLocationId;
+
+        // First, check if the location with this city name exists in the db
+        Cursor movieCursor = getActivity().getContentResolver().query(
+                MovieContract.MovieEntry.CONTENT_URI,
+                new String[]{MovieContract.MovieEntry._ID},
+                MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ?",
+                new String[]{id},
+                null);
+
+        if (movieCursor.moveToFirst()) {
+            int movieIdIndex = movieCursor.getColumnIndex(MovieContract.MovieEntry._ID);
+            movieLocationId = movieCursor.getLong(movieIdIndex);
+        } else {
+            // Now that the content provider is set up, inserting rows of data is pretty simple.
+            // First create a ContentValues object to hold the data you want to insert.
+            ContentValues movieValues = new ContentValues();
+
+            // Then add the data, along with the corresponding name of the data type,
+            // so the content provider knows what kind of value is being inserted.
+            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_BACKDROPPATH, backdropPath);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, id);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE, originalTitle);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_POSTERPATH, posterPath);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_OVERVIEW, overview);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_RELEASEDATE, releaseDate);
+            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_AVERAGEVOTE, voteAverage);
+
+
+            // Finally, insert location data into the database.
+            Uri insertedUri =  getActivity().getContentResolver().insert(
+                    MovieContract.MovieEntry.CONTENT_URI,
+                    movieValues
+            );
+
+            // The resulting URI contains the ID for the row.  Extract the locationId from the Uri.
+            movieLocationId = ContentUris.parseId(insertedUri);
+        }
+
+        movieCursor.close();
+        return movieLocationId;
+    }
     private void updateMovieList(){
         //Log.v(TAG, "updateMovieList() called");
         String sortBy = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
@@ -71,6 +124,32 @@ public class PopularMovieListFragment extends Fragment {
             @Override
             public void success(Results results, Response response) {
                 res = results;
+                // Insert the new weather information into the database
+                Vector<ContentValues> cVVector = new Vector<ContentValues>(results.getResults().size());
+
+                for(int i =0;i<results.getResults().size();i++) {
+                    ContentValues weatherValues = new ContentValues();
+
+                    weatherValues.put(MovieEntry.COLUMN_MOVIE_BACKDROPPATH, results.getResults().get(i).getBackdropPath());
+                    weatherValues.put(MovieEntry.COLUMN_MOVIE_ID, results.getResults().get(i).getId());
+                    weatherValues.put(MovieEntry.COLUMN_MOVIE_TITLE, results.getResults().get(i).getOriginalTitle());
+                    weatherValues.put(MovieEntry.COLUMN_MOVIE_POSTERPATH, results.getResults().get(i).getPosterPath());
+                    weatherValues.put(MovieEntry.COLUMN_MOVIE_OVERVIEW, results.getResults().get(i).getOverview());
+                    weatherValues.put(MovieEntry.COLUMN_MOVIE_RELEASEDATE, results.getResults().get(i).getReleaseDate());
+                    weatherValues.put(MovieEntry.COLUMN_MOVIE_AVERAGEVOTE, results.getResults().get(i).getVoteAverage());
+
+                    cVVector.add(weatherValues);
+                }
+                int inserted = 0;
+                // add to database
+                if ( cVVector.size() > 0 ) {
+                    ContentValues[] cvArray = new ContentValues[cVVector.size()];
+                    cVVector.toArray(cvArray);
+                    inserted = getActivity().getContentResolver().bulkInsert(MovieEntry.CONTENT_URI, cvArray);
+                }
+
+                Log.d(TAG, "Popmovies Complete. " + inserted + " Inserted");
+
                 imageAdapter = new ImageAdapter(getActivity(), results);
                 imageAdapter.notifyDataSetChanged();
                 gridView.setAdapter(imageAdapter);

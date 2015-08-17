@@ -195,12 +195,6 @@ public class MovieDetailFragment extends Fragment {
         ImageView backdropView = (ImageView)rootView.findViewById(R.id.backdrop_view);
         Picasso.with(getActivity()).load(obj.getBackdropPath()).into(backdropView);
 
-
-        //backdropView.setImageBitmap(obj.getBackdropPath());
-
-     //   TextView movieTitle = (TextView) rootView.findViewById(R.id.movieTitle);
-     //   movieTitle.setText(obj.getOriginalTitle());
-
         ImageView view = (ImageView) rootView.findViewById(R.id.posterPath);
         Picasso.with(getActivity()).load(obj.getPosterPath()).into(view);
 
