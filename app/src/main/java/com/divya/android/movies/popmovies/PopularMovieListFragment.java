@@ -124,21 +124,23 @@ public class PopularMovieListFragment extends Fragment {
             @Override
             public void success(Results results, Response response) {
                 res = results;
+
+                Log.d(TAG, "size of movie db = " + results.getResults().size());
                 // Insert the new weather information into the database
                 Vector<ContentValues> cVVector = new Vector<ContentValues>(results.getResults().size());
 
                 for(int i =0;i<results.getResults().size();i++) {
-                    ContentValues weatherValues = new ContentValues();
+                    ContentValues movieValues = new ContentValues();
 
-                    weatherValues.put(MovieEntry.COLUMN_MOVIE_BACKDROPPATH, results.getResults().get(i).getBackdropPath());
-                    weatherValues.put(MovieEntry.COLUMN_MOVIE_ID, results.getResults().get(i).getId());
-                    weatherValues.put(MovieEntry.COLUMN_MOVIE_TITLE, results.getResults().get(i).getOriginalTitle());
-                    weatherValues.put(MovieEntry.COLUMN_MOVIE_POSTERPATH, results.getResults().get(i).getPosterPath());
-                    weatherValues.put(MovieEntry.COLUMN_MOVIE_OVERVIEW, results.getResults().get(i).getOverview());
-                    weatherValues.put(MovieEntry.COLUMN_MOVIE_RELEASEDATE, results.getResults().get(i).getReleaseDate());
-                    weatherValues.put(MovieEntry.COLUMN_MOVIE_AVERAGEVOTE, results.getResults().get(i).getVoteAverage());
+                    movieValues.put(MovieEntry.COLUMN_MOVIE_BACKDROPPATH, results.getResults().get(i).getBackdropPath());
+                    movieValues.put(MovieEntry.COLUMN_MOVIE_ID, results.getResults().get(i).getId());
+                    movieValues.put(MovieEntry.COLUMN_MOVIE_TITLE, results.getResults().get(i).getOriginalTitle());
+                    movieValues.put(MovieEntry.COLUMN_MOVIE_POSTERPATH, results.getResults().get(i).getPosterPath());
+                    movieValues.put(MovieEntry.COLUMN_MOVIE_OVERVIEW, results.getResults().get(i).getOverview());
+                    movieValues.put(MovieEntry.COLUMN_MOVIE_RELEASEDATE, results.getResults().get(i).getReleaseDate());
+                    movieValues.put(MovieEntry.COLUMN_MOVIE_AVERAGEVOTE, results.getResults().get(i).getVoteAverage());
 
-                    cVVector.add(weatherValues);
+                    cVVector.add(movieValues);
                 }
                 int inserted = 0;
                 // add to database
@@ -148,7 +150,7 @@ public class PopularMovieListFragment extends Fragment {
                     inserted = getActivity().getContentResolver().bulkInsert(MovieEntry.CONTENT_URI, cvArray);
                 }
 
-                Log.d(TAG, "Popmovies Complete. " + inserted + " Inserted");
+                Log.d(TAG, "PopMovies Complete. " + inserted + " Inserted");
 
                 imageAdapter = new ImageAdapter(getActivity(), results);
                 imageAdapter.notifyDataSetChanged();

@@ -3,6 +3,7 @@ package com.divya.android.movies.popmovies.data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.divya.android.movies.popmovies.data.MovieContract.MovieEntry;
 
@@ -31,6 +32,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 MovieEntry.COLUMN_MOVIE_AVERAGEVOTE + " REAL NOT NULL " +
                 " );";
 
+        Log.d(DATABASE_NAME, "Create table statement : " + SQL_CREATE_MOVIE_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_MOVIE_TABLE);
 
     }

@@ -43,7 +43,7 @@ public class MovieContract {
         public static final String COLUMN_MOVIE_BACKDROPPATH = "backdropPath";
 
         //Id of movie
-        public static final String COLUMN_MOVIE_ID = "movie_id";
+        public static final String COLUMN_MOVIE_ID = "movieId";
 
         //Movietitle
         public static final String COLUMN_MOVIE_TITLE = "original_title";
