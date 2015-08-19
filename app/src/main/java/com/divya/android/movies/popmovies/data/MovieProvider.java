@@ -17,7 +17,8 @@ public class MovieProvider extends ContentProvider {
 
 
     private MovieDbHelper mOpenHelper;
-    static final int MOVIE = 100;
+    static final int POPULAR = 100;
+    static final int VOTE = 300;
 
     /* private static final SQLiteQueryBuilder smovieQueryBuilder;
 
@@ -39,7 +40,8 @@ public class MovieProvider extends ContentProvider {
         final String authority = MovieContract.CONTENT_AUTHORITY;
 
         // For each type of URI you want to add, create a corresponding code.
-        matcher.addURI(authority, MovieContract.PATH_MOVIE, MOVIE);
+        matcher.addURI(authority, MovieContract.PATH_POPULARITY, POPULAR);
+        matcher.addURI(authority, MovieContract.PATH_VOTE, VOTE);
         return matcher;
     }
 
@@ -55,9 +57,22 @@ public class MovieProvider extends ContentProvider {
         // and query the database accordingly.
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
-            case MOVIE: {
+            case POPULAR: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
-                        MovieContract.MovieEntry.TABLE_NAME,
+                        MovieContract.MoviePopularityEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
+
+            case VOTE: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        MovieContract.MovieVoteAverageEntry.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -85,10 +100,10 @@ public class MovieProvider extends ContentProvider {
                 return WeatherContract.WeatherEntry.CONTENT_ITEM_TYPE;
             case WEATHER_WITH_LOCATION:
                 return WeatherContract.WeatherEntry.CONTENT_TYPE;*/
-            case MOVIE:
-                return MovieContract.MovieEntry.CONTENT_TYPE;
-            /*case LOCATION:
-                return WeatherContract.LocationEntry.CONTENT_TYPE;*/
+            case POPULAR:
+                return MovieContract.MoviePopularityEntry.CONTENT_TYPE;
+            case VOTE:
+                return MovieContract.MovieVoteAverageEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -100,11 +115,20 @@ public class MovieProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
         Uri returnUri;
         switch (match) {
-            case MOVIE: {
+            case POPULAR: {
                 // normalizeDate(values);
-                long _id = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, values);
+                long _id = db.insert(MovieContract.MoviePopularityEntry.TABLE_NAME, null, values);
                 if (_id > 0)
-                    returnUri = MovieContract.MovieEntry.buildMovieUri(_id);
+                    returnUri = MovieContract.MoviePopularityEntry.buildMovieUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
+            case VOTE: {
+                // normalizeDate(values);
+                long _id = db.insert(MovieContract.MovieVoteAverageEntry.TABLE_NAME, null, values);
+                if (_id > 0)
+                    returnUri = MovieContract.MovieVoteAverageEntry.buildMovieUri(_id);
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
@@ -125,9 +149,13 @@ public class MovieProvider extends ContentProvider {
         // this makes delete all rows return the number of rows deleted
         if (null == selection) selection = "1";
         switch (match) {
-            case MOVIE:
+            case POPULAR:
                 rowsDeleted = db.delete(
-                        MovieContract.MovieEntry.TABLE_NAME, selection, selectionArgs);
+                        MovieContract.MoviePopularityEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case VOTE:
+                rowsDeleted = db.delete(
+                        MovieContract.MovieVoteAverageEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -146,9 +174,14 @@ public class MovieProvider extends ContentProvider {
         int rowsUpdated;
 
         switch (match) {
-            case MOVIE:
+            case POPULAR:
                 //normalizeDate(values);
-                rowsUpdated = db.update(MovieContract.MovieEntry.TABLE_NAME, values, selection,
+                rowsUpdated = db.update(MovieContract.MoviePopularityEntry.TABLE_NAME, values, selection,
+                        selectionArgs);
+                break;
+            case VOTE:
+                //normalizeDate(values);
+                rowsUpdated = db.update(MovieContract.MovieVoteAverageEntry.TABLE_NAME, values, selection,
                         selectionArgs);
                 break;
             default:
@@ -165,13 +198,13 @@ public class MovieProvider extends ContentProvider {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         switch (match) {
-            case MOVIE:
+            case POPULAR: {
                 db.beginTransaction();
                 int returnCount = 0;
                 try {
                     for (ContentValues value : values) {
                         //normalizeDate(value);
-                        long _id = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, value);
+                        long _id = db.insert(MovieContract.MoviePopularityEntry.TABLE_NAME, null, value);
                         if (_id != -1) {
                             returnCount++;
                         }
@@ -182,6 +215,25 @@ public class MovieProvider extends ContentProvider {
                 }
                 getContext().getContentResolver().notifyChange(uri, null);
                 return returnCount;
+            }
+            case VOTE: {
+                db.beginTransaction();
+                int returnCount = 0;
+                try {
+                    for (ContentValues value : values) {
+                        //normalizeDate(value);
+                        long _id = db.insert(MovieContract.MovieVoteAverageEntry.TABLE_NAME, null, value);
+                        if (_id != -1) {
+                            returnCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri, null);
+                return returnCount;
+            }
             default:
                 return super.bulkInsert(uri, values);
         }

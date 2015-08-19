@@ -24,20 +24,64 @@ public class MovieContract {
     // looking at weather data. content://com.divya.android.movies.popmovies/givemeroot/ will fail,
     // as the ContentProvider hasn't been given any information on what to do with "givemeroot".
     // At least, let's hope not.  Don't be that dev, reader.  Don't be that dev.
-    public static final String PATH_MOVIE = "movie";
+    public static final String PATH_POPULARITY = "popular";
+    public static final String PATH_VOTE = "vote";
 
-    public static final class MovieEntry implements BaseColumns {
+    public static final class MoviePopularityEntry implements BaseColumns {
         public static final Uri CONTENT_URI =
-                BASE_CONTENT_URI.buildUpon().appendPath(PATH_MOVIE).build();
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_POPULARITY).build();
 
         public static final String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE;
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_POPULARITY;
 
         public static final String CONTENT_ITEM_TYPE =
-                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE;
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_POPULARITY;
 
         // Table name
-        public static final String TABLE_NAME = "movie";
+        public static final String TABLE_NAME = "popularity";
+
+        //backdrop Image of movie
+        public static final String COLUMN_MOVIE_BACKDROPPATH = "backdropPath";
+
+        //Id of movie
+        public static final String COLUMN_MOVIE_ID = "movieId";
+
+        //Movietitle
+        public static final String COLUMN_MOVIE_TITLE = "original_title";
+
+        //Movie overview
+        public static final String COLUMN_MOVIE_OVERVIEW = "overview";
+
+        //RELEASEDATE of movie
+        public static final String COLUMN_MOVIE_RELEASEDATE = "release_date";
+
+        //POSTER Image of movie
+        public static final String COLUMN_MOVIE_POSTERPATH = "poster_path";
+
+        //Average vote of movie
+        public static final String COLUMN_MOVIE_AVERAGEVOTE = "vote_average";
+
+
+        public static Uri buildMovieUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+
+    }
+
+
+    public static final class MovieVoteAverageEntry implements BaseColumns {
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_VOTE).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_VOTE;
+
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_VOTE;
+
+        // Table name
+        public static final String TABLE_NAME = "voteaverage";
 
         //backdrop Image of movie
         public static final String COLUMN_MOVIE_BACKDROPPATH = "backdropPath";

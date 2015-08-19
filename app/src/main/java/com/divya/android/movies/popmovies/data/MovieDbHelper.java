@@ -5,7 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.divya.android.movies.popmovies.data.MovieContract.MovieEntry;
+import com.divya.android.movies.popmovies.data.MovieContract.MoviePopularityEntry;
+import com.divya.android.movies.popmovies.data.MovieContract.MovieVoteAverageEntry;
 
 /**
  * Created by KeerthanaS on 8/16/2015.
@@ -21,19 +22,35 @@ public class MovieDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        final String SQL_CREATE_MOVIE_TABLE= "CREATE TABLE " + MovieEntry.TABLE_NAME + " (" +
-                MovieEntry._ID + " INTEGER PRIMARY KEY," +
-                MovieEntry.COLUMN_MOVIE_BACKDROPPATH + " TEXT NOT NULL, " +
-                MovieEntry.COLUMN_MOVIE_ID + " TEXT UNIQUE NOT NULL, " +
-                MovieEntry.COLUMN_MOVIE_TITLE + " TEXT NOT NULL, " +
-                MovieEntry.COLUMN_MOVIE_OVERVIEW + " TEXT NOT NULL, " +
-                MovieEntry.COLUMN_MOVIE_RELEASEDATE + " TEXT NOT NULL, " +
-                MovieEntry.COLUMN_MOVIE_POSTERPATH + " TEXT NOT NULL, " +
-                MovieEntry.COLUMN_MOVIE_AVERAGEVOTE + " REAL NOT NULL " +
+        final String SQL_CREATE_POPULARITY_TABLE= "CREATE TABLE " + MoviePopularityEntry.TABLE_NAME + " (" +
+                MoviePopularityEntry._ID + " INTEGER PRIMARY KEY," +
+                MoviePopularityEntry.COLUMN_MOVIE_BACKDROPPATH + " TEXT NOT NULL, " +
+                MoviePopularityEntry.COLUMN_MOVIE_ID + " TEXT UNIQUE NOT NULL, " +
+                MoviePopularityEntry.COLUMN_MOVIE_TITLE + " TEXT NOT NULL, " +
+                MoviePopularityEntry.COLUMN_MOVIE_OVERVIEW + " TEXT NOT NULL, " +
+                MoviePopularityEntry.COLUMN_MOVIE_RELEASEDATE + " TEXT NOT NULL, " +
+                MoviePopularityEntry.COLUMN_MOVIE_POSTERPATH + " TEXT NOT NULL, " +
+                MoviePopularityEntry.COLUMN_MOVIE_AVERAGEVOTE + " REAL NOT NULL " +
                 " );";
 
-        Log.d(DATABASE_NAME, "Create table statement : " + SQL_CREATE_MOVIE_TABLE);
-        sqLiteDatabase.execSQL(SQL_CREATE_MOVIE_TABLE);
+        Log.d(DATABASE_NAME, "Create popularity table statement : " + SQL_CREATE_POPULARITY_TABLE);
+
+        final String SQL_CREATE_VOTE_TABLE= "CREATE TABLE " + MovieVoteAverageEntry.TABLE_NAME + " (" +
+                MovieVoteAverageEntry._ID + " INTEGER PRIMARY KEY," +
+                MovieVoteAverageEntry.COLUMN_MOVIE_BACKDROPPATH + " TEXT, " +
+                MovieVoteAverageEntry.COLUMN_MOVIE_ID + " TEXT UNIQUE NOT NULL, " +
+                MovieVoteAverageEntry.COLUMN_MOVIE_TITLE + " TEXT NOT NULL, " +
+                MovieVoteAverageEntry.COLUMN_MOVIE_OVERVIEW + " TEXT, " +
+                MovieVoteAverageEntry.COLUMN_MOVIE_RELEASEDATE + " TEXT, " +
+                MovieVoteAverageEntry.COLUMN_MOVIE_POSTERPATH + " TEXT, " +
+                MovieVoteAverageEntry.COLUMN_MOVIE_AVERAGEVOTE + " REAL " +
+                " );";
+
+        Log.d(DATABASE_NAME, "Create vote table statement : " + SQL_CREATE_VOTE_TABLE);
+
+
+        sqLiteDatabase.execSQL(SQL_CREATE_POPULARITY_TABLE);
+        sqLiteDatabase.execSQL(SQL_CREATE_VOTE_TABLE);
 
     }
 
@@ -45,7 +62,8 @@ public class MovieDbHelper extends SQLiteOpenHelper {
         // It does NOT depend on the version number for your application.
         // If you want to update the schema without wiping data, commenting out the next 2 lines
         // should be your top priority before modifying this method.
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MoviePopularityEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieVoteAverageEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
 }
