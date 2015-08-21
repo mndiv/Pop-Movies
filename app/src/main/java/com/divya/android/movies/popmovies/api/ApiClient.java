@@ -3,7 +3,7 @@ package com.divya.android.movies.popmovies.api;
 import retrofit.RestAdapter;
 
 /**
- * Created by KeerthanaS on 7/26/2015.
+ * Created by DivyaM on 7/26/2015.
  */
 public class ApiClient {
     static final String MOVIES_BASE_URL ="http://api.themoviedb.org/3";

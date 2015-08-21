@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 /**
- * Created by KeerthanaS on 8/17/2015.
+ * Created by DivyaM on 8/17/2015.
  */
 public class Utility {
     public static boolean isSorting(Context context) {

@@ -1,6 +1,7 @@
 package com.divya.android.movies.popmovies.data;
 
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -8,7 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
 /**
- * Created by KeerthanaS on 8/16/2015.
+ * Created by DivyaM on 8/16/2015.
  */
 public class MovieProvider extends ContentProvider {
 
@@ -18,7 +19,9 @@ public class MovieProvider extends ContentProvider {
 
     private MovieDbHelper mOpenHelper;
     static final int POPULAR = 100;
-    static final int VOTE = 300;
+    static final int VOTE = 200;
+    private static final int POPULAR_WITH_ID = 300;
+    private static final int VOTE_WITH_ID = 400;
 
     /* private static final SQLiteQueryBuilder smovieQueryBuilder;
 
@@ -41,7 +44,9 @@ public class MovieProvider extends ContentProvider {
 
         // For each type of URI you want to add, create a corresponding code.
         matcher.addURI(authority, MovieContract.PATH_POPULARITY, POPULAR);
+        matcher.addURI(authority, MovieContract.PATH_POPULARITY + "/#", POPULAR_WITH_ID);
         matcher.addURI(authority, MovieContract.PATH_VOTE, VOTE);
+        matcher.addURI(authority, MovieContract.PATH_VOTE + "/#", POPULAR_WITH_ID);
         return matcher;
     }
 
@@ -82,6 +87,32 @@ public class MovieProvider extends ContentProvider {
                 );
                 break;
             }
+            case POPULAR_WITH_ID: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        MovieContract.MoviePopularityEntry.TABLE_NAME,
+                        projection,
+                        MovieContract.MoviePopularityEntry._ID + " = ?",
+                        new String[] {String.valueOf(ContentUris.parseId(uri))},
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
+
+            case VOTE_WITH_ID
+                    : {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        MovieContract.MovieVoteAverageEntry.TABLE_NAME,
+                        projection,
+                        MovieContract.MovieVoteAverageEntry._ID + " = ?",
+                        new String[] {String.valueOf(ContentUris.parseId(uri))},
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -104,6 +135,11 @@ public class MovieProvider extends ContentProvider {
                 return MovieContract.MoviePopularityEntry.CONTENT_TYPE;
             case VOTE:
                 return MovieContract.MovieVoteAverageEntry.CONTENT_TYPE;
+
+            case POPULAR_WITH_ID:
+                return MovieContract.MoviePopularityEntry.CONTENT_ITEM_TYPE;
+            case VOTE_WITH_ID:
+                return MovieContract.MovieVoteAverageEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -152,10 +188,30 @@ public class MovieProvider extends ContentProvider {
             case POPULAR:
                 rowsDeleted = db.delete(
                         MovieContract.MoviePopularityEntry.TABLE_NAME, selection, selectionArgs);
+                db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" +
+                        MovieContract.MoviePopularityEntry.TABLE_NAME + "'");
                 break;
             case VOTE:
                 rowsDeleted = db.delete(
                         MovieContract.MovieVoteAverageEntry.TABLE_NAME, selection, selectionArgs);
+                db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" +
+                        MovieContract.MovieVoteAverageEntry.TABLE_NAME + "'");
+                break;
+            case POPULAR_WITH_ID:
+                rowsDeleted = db.delete(
+                        MovieContract.MoviePopularityEntry.TABLE_NAME,
+                        MovieContract.MoviePopularityEntry._ID + " = ?",
+                        new String[]{String.valueOf(ContentUris.parseId(uri))});
+                db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" +
+                        MovieContract.MoviePopularityEntry.TABLE_NAME + "'");
+                break;
+            case VOTE_WITH_ID:
+                rowsDeleted = db.delete(
+                        MovieContract.MovieVoteAverageEntry.TABLE_NAME,
+                        MovieContract.MovieVoteAverageEntry._ID + " = ?",
+                        new String[]{String.valueOf(ContentUris.parseId(uri))});
+                db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" +
+                        MovieContract.MovieVoteAverageEntry.TABLE_NAME + "'");
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -183,6 +239,20 @@ public class MovieProvider extends ContentProvider {
                 //normalizeDate(values);
                 rowsUpdated = db.update(MovieContract.MovieVoteAverageEntry.TABLE_NAME, values, selection,
                         selectionArgs);
+                break;
+            case POPULAR_WITH_ID:
+                //normalizeDate(values);
+                rowsUpdated = db.update(MovieContract.MoviePopularityEntry.TABLE_NAME,
+                        values,
+                        MovieContract.MoviePopularityEntry._ID + " = ?",
+                        new String[] {String.valueOf(ContentUris.parseId(uri))});
+                break;
+            case VOTE_WITH_ID:
+                //normalizeDate(values);
+                rowsUpdated = db.update(MovieContract.MovieVoteAverageEntry.TABLE_NAME,
+                        values,
+                        MovieContract.MovieVoteAverageEntry._ID + " = ?",
+                        new String[] {String.valueOf(ContentUris.parseId(uri))});
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);

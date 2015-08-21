@@ -6,7 +6,7 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 
 /**
- * Created by KeerthanaS on 8/16/2015.
+ * Created by DivyaM on 8/16/2015.
  */
 public class MovieContract {
     // The "Content authority" is a name for the entire content provider, similar to the

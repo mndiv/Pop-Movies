@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by KeerthanaS on 7/22/2015.
+ * Created by DivyaM on 7/22/2015.
  */
 public class Results implements Parcelable{
 

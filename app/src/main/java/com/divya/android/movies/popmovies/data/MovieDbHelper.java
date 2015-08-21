@@ -9,7 +9,7 @@ import com.divya.android.movies.popmovies.data.MovieContract.MoviePopularityEntr
 import com.divya.android.movies.popmovies.data.MovieContract.MovieVoteAverageEntry;
 
 /**
- * Created by KeerthanaS on 8/16/2015.
+ * Created by DivyaM on 8/16/2015.
  */
 public class MovieDbHelper extends SQLiteOpenHelper {
 

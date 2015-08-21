@@ -10,7 +10,7 @@ import retrofit.http.Path;
 import retrofit.http.Query;
 
 /**
- * Created by KeerthanaS on 7/20/2015.
+ * Created by DivyaM on 7/20/2015.
  */
 public interface GetMovieDataApi {
     @GET("/discover/movie")

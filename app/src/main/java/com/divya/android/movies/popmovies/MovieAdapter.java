@@ -14,7 +14,7 @@ import com.divya.android.movies.popmovies.data.MovieContract;
 import com.squareup.picasso.Picasso;
 
 /**
- * Created by KeerthanaS on 8/19/2015.
+ * Created by DivyaM on 8/19/2015.
  */
 public class MovieAdapter extends CursorAdapter{
 

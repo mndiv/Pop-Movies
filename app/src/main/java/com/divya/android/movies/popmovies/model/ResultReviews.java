@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by KeerthanaS on 8/8/2015.
+ * Created by DivyaM on 8/8/2015.
  */
 public class ResultReviews {
 
