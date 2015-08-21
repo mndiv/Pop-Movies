@@ -1,28 +1,25 @@
 package com.divya.android.movies.popmovies;
 
 import android.content.ContentValues;
-import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.GridView;
-import android.widget.ImageView;
 
 import com.divya.android.movies.popmovies.api.ApiClient;
 import com.divya.android.movies.popmovies.api.GetMovieDataApi;
 import com.divya.android.movies.popmovies.data.MovieContract.MoviePopularityEntry;
 import com.divya.android.movies.popmovies.data.MovieContract.MovieVoteAverageEntry;
-import com.divya.android.movies.popmovies.model.MovieInfo;
 import com.divya.android.movies.popmovies.model.Results;
-import com.squareup.picasso.Picasso;
 
 import java.util.Vector;
 
@@ -34,11 +31,13 @@ import retrofit.client.Response;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class PopularMovieListFragment extends Fragment {
+public class PopularMovieListFragment extends Fragment
+        implements LoaderManager.LoaderCallbacks<Cursor>{
 
+    private static final int MOVIE_LOADER = 0;
     //gridView holds the id defined in fragment_main.xml
     private GridView gridView;
-    ImageAdapter imageAdapter;
+    //ImageAdapter imageAdapter;
     private SharedPreferences sharedPrefs;
     static final String MOVIES_BASE_URL = "http://api.themoviedb.org/3";
     protected final String TAG = getClass().getSimpleName();
@@ -47,6 +46,7 @@ public class PopularMovieListFragment extends Fragment {
     final String API_KEY = "api_key";
     SharedPreferences.OnSharedPreferenceChangeListener listener;
     Results res;
+    private MovieAdapter mMovieAdapter;
 
     public PopularMovieListFragment() {
 
@@ -183,7 +183,7 @@ public class PopularMovieListFragment extends Fragment {
 
 
 
-                imageAdapter = new ImageAdapter(getActivity(), results);
+               /* imageAdapter = new ImageAdapter(getActivity(), results);
                 imageAdapter.notifyDataSetChanged();
                 gridView.setAdapter(imageAdapter);
                 gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -195,7 +195,7 @@ public class PopularMovieListFragment extends Fragment {
                         intent.putExtra("MovieInfo", obj);
                         startActivity(intent);
                     }
-                });
+                });*/
             }
 
             @Override
@@ -205,16 +205,43 @@ public class PopularMovieListFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        Log.d(TAG, "onActivityCreated");
+        Cursor c =
+                getActivity().getContentResolver().query(MoviePopularityEntry.CONTENT_URI,
+                        new String[]{MoviePopularityEntry._ID},
+                        null,
+                        null,
+                        null);
+
+        if (c.getCount() == 0){
+            updateMovieList();
+        }
+
+        // initialize loader
+        getLoaderManager().initLoader(MOVIE_LOADER, null, this);
+        super.onActivityCreated(savedInstanceState);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView");
+        mMovieAdapter = new MovieAdapter(getActivity(),null,0,MOVIE_LOADER);
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         gridView = (GridView) rootView.findViewById(R.id.gridview);
+        gridView.setAdapter(mMovieAdapter);
+
         if (savedInstanceState != null) {
             res = savedInstanceState.getParcelable("KEY_RESULTS_LIST");
-            imageAdapter = new ImageAdapter(getActivity(), res);
-            gridView.setAdapter(imageAdapter);
+//            imageAdapter = new ImageAdapter(getActivity(), res);
+//            gridView.setAdapter(imageAdapter);  // divya
         }
 
         // Log.v(TAG,"onCreateView()");
@@ -224,8 +251,11 @@ public class PopularMovieListFragment extends Fragment {
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         service = ApiClient.MovieDataApiInterface();
         updateMovieList();
+        gridView.setAdapter(mMovieAdapter);
         registerPreferenceListener();
 
+       // Cursor cur = getActivity().getContentResolver().query(MoviePopularityEntry.CONTENT_URI,null, null, null, null);
+       // Log.d(TAG, " Cursor Count = " + cur.getString(cur.getColumnIndex(MoviePopularityEntry.COLUMN_MOVIE_POSTERPATH)));
         return rootView;
     }
 
@@ -242,6 +272,34 @@ public class PopularMovieListFragment extends Fragment {
         super.onDestroy();
     }
 
+    // Attach loader to our flavors database query
+    // run when loader is initialized
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args){
+        return new CursorLoader(getActivity(),
+                MoviePopularityEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        mMovieAdapter.swapCursor(data);
+
+
+    }
+
+    // reset CursorAdapter on Loader Reset
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader){
+        mMovieAdapter.swapCursor(null);
+    }
+
+
+    /*
     public class ImageAdapter extends BaseAdapter {
         private final String LOG_TAG = ImageAdapter.class.getSimpleName();
         private Context mContext;
@@ -283,5 +341,5 @@ public class PopularMovieListFragment extends Fragment {
             Picasso.with(mContext).load(mResults.getResults().get(position).getPosterPath()).into(view);
             return view;
         }
-    }
+    }*/
 }
