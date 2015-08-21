@@ -168,14 +168,13 @@ public class MovieDetailFragment extends Fragment
                 for (int i = 0; i < resultReviews.getResults().size(); i++) {
 
                     Log.d(TAG, "author:" + resultReviews.getResults().get(i).getAuthor());
+                    Log.d(TAG, "Review:" + resultReviews.getResults().get(i).getContent());
 
                     review += resultReviews.getResults().get(i).getAuthor() + "\n\n" +
-                            resultReviews.getResults().get(i).getContent() + "\n\n";
+                            resultReviews.getResults().get(i).getContent() + "\n\n\n\n";
                 }
                 if (review != "")
                     reviews.setText(review);
-                else
-                    reviews.setText("No Reviews");
             }
 
             @Override
