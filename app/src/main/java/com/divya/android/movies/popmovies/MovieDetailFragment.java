@@ -26,7 +26,6 @@ import android.widget.TextView;
 
 import com.divya.android.movies.popmovies.api.ApiClient;
 import com.divya.android.movies.popmovies.api.GetMovieDataApi;
-import com.divya.android.movies.popmovies.data.MovieContract;
 import com.divya.android.movies.popmovies.model.ResultReviews;
 import com.divya.android.movies.popmovies.model.ResultVideos;
 import com.divya.android.movies.popmovies.model.UriData;
@@ -49,7 +48,6 @@ public class MovieDetailFragment extends Fragment
     CollapsingToolbarLayout collapsingToolbarLayout;
     CoordinatorLayout rootLayout;
     FloatingActionButton fabBtn;
-    private static final int MOVIE_LOADER = 0;
     private int mUriId;
     private Uri mUri;
     private Cursor mDetailCursor;
@@ -59,6 +57,7 @@ public class MovieDetailFragment extends Fragment
     private TextView userRating;
     private TextView overview;
     RecyclerView recList;
+    private static final int DETAIL_LOADER = 0;
 
 
     private String mPosterPath;
@@ -71,6 +70,13 @@ public class MovieDetailFragment extends Fragment
 
     public MovieDetailFragment() {
     }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        getLoaderManager().initLoader(DETAIL_LOADER, null, this);
+        super.onActivityCreated(savedInstanceState);
+    }
+
 
 
     public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TrailerViewHolder> {
@@ -195,7 +201,7 @@ public class MovieDetailFragment extends Fragment
         mUri = uriObj.getUri();
 
         Log.d(TAG, "content Uri : " + mUri);
-        getLoaderManager().initLoader(MOVIE_LOADER, null, MovieDetailFragment.this);
+        //getLoaderManager().initLoader(MOVIE_LOADER, null, MovieDetailFragment.this);
 
 
         backdropView = (ImageView)rootView.findViewById(R.id.backdrop_view);
@@ -208,7 +214,7 @@ public class MovieDetailFragment extends Fragment
 
         rootLayout = (CoordinatorLayout) rootView.findViewById(R.id.rootLayout);
         collapsingToolbarLayout = (CollapsingToolbarLayout) rootView.findViewById(R.id.collapsingToolbarLayout);
-       // collapsingToolbarLayout.setTitle(obj.getOriginalTitle());
+
         fabBtn = (FloatingActionButton) rootView.findViewById(R.id.fabBtn);
         fabBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -268,6 +274,7 @@ public class MovieDetailFragment extends Fragment
         String selection = null;
         String [] selectionArgs = null;
 
+        Log.d(TAG , "mUri in DetailFragment :" + mUri);
         return new CursorLoader(getActivity(),
                 mUri,
                 null,
@@ -283,30 +290,34 @@ public class MovieDetailFragment extends Fragment
 
     // Set the cursor in our CursorAdapter once the Cursor is loaded
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mDetailCursor = data;
+    public void onLoadFinished(Loader<Cursor> loader, Cursor mDetailCursor) {
+
         mDetailCursor.moveToFirst();
-        DatabaseUtils.dumpCursor(data);
+        DatabaseUtils.dumpCursor(mDetailCursor);
+
+        int colIdx = mDetailCursor.getColumnIndex("original_title");
+        collapsingToolbarLayout.setTitle(mDetailCursor.getString(colIdx));
+
         //Backdrop Image
-        int colIdx = mDetailCursor.getColumnIndex(MovieContract.MoviePopularityEntry.COLUMN_MOVIE_BACKDROPPATH);
+        colIdx = mDetailCursor.getColumnIndex("backdropPath");
         Picasso.with(getActivity()).load(mDetailCursor.getString(colIdx)).into(backdropView);
 
         //PosterImage
-        colIdx = mDetailCursor.getColumnIndex(MovieContract.MoviePopularityEntry.COLUMN_MOVIE_POSTERPATH);
+        colIdx = mDetailCursor.getColumnIndex("poster_path");
         Picasso.with(getActivity()).load(mDetailCursor.getString(colIdx)).into(posterView);
 
 
         //Release Date
-        colIdx = mDetailCursor.getColumnIndex(MovieContract.MoviePopularityEntry.COLUMN_MOVIE_RELEASEDATE);
+        colIdx = mDetailCursor.getColumnIndex( "release_date");
         String str = mDetailCursor.getString(colIdx).substring(0, 4);
         releaseDate.setText(str);
 
         //userRating
-        colIdx = mDetailCursor.getColumnIndex(MovieContract.MoviePopularityEntry.COLUMN_MOVIE_AVERAGEVOTE);
+        colIdx = mDetailCursor.getColumnIndex("vote_average");
         userRating.setText(Double.toString(mDetailCursor.getDouble(colIdx)) + "/10");
 
         //overview
-        colIdx = mDetailCursor.getColumnIndex(MovieContract.MoviePopularityEntry.COLUMN_MOVIE_AVERAGEVOTE);
+        colIdx = mDetailCursor.getColumnIndex("overview");
         overview.setText(mDetailCursor.getString(colIdx));
 
         //Videos List
@@ -316,7 +327,7 @@ public class MovieDetailFragment extends Fragment
         llm.setOrientation(LinearLayoutManager.HORIZONTAL);
         recList.setLayoutManager(llm);
 
-        colIdx = mDetailCursor.getColumnIndex(MovieContract.MoviePopularityEntry.COLUMN_MOVIE_ID);
+        colIdx = mDetailCursor.getColumnIndex("movieId");
         GetTrailers(mDetailCursor.getString(colIdx));
 
 

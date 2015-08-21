@@ -40,33 +40,31 @@ public class MovieContract {
         // Table name
         public static final String TABLE_NAME = "popularity";
 
-        //backdrop Image of movie
-        public static final String COLUMN_MOVIE_BACKDROPPATH = "backdropPath";
-
-        //Id of movie
-        public static final String COLUMN_MOVIE_ID = "movieId";
-
         //Movietitle
         public static final String COLUMN_MOVIE_TITLE = "original_title";
 
-        //Movie overview
-        public static final String COLUMN_MOVIE_OVERVIEW = "overview";
-
-        //RELEASEDATE of movie
-        public static final String COLUMN_MOVIE_RELEASEDATE = "release_date";
+        //backdrop Image of movie
+        public static final String COLUMN_MOVIE_BACKDROPPATH = "backdropPath";
 
         //POSTER Image of movie
         public static final String COLUMN_MOVIE_POSTERPATH = "poster_path";
+
+        //RELEASEDATE of movie
+        public static final String COLUMN_MOVIE_RELEASEDATE = "release_date";
 
         //Average vote of movie
         public static final String COLUMN_MOVIE_AVERAGEVOTE = "vote_average";
 
 
+        //Movie overview
+        public static final String COLUMN_MOVIE_OVERVIEW = "overview";
+
+        //Id of movie
+        public static final String COLUMN_MOVIE_ID = "movieId";
+
         public static Uri buildMovieUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
-
-
     }
 
 
@@ -83,26 +81,27 @@ public class MovieContract {
         // Table name
         public static final String TABLE_NAME = "voteaverage";
 
-        //backdrop Image of movie
-        public static final String COLUMN_MOVIE_BACKDROPPATH = "backdropPath";
-
-        //Id of movie
-        public static final String COLUMN_MOVIE_ID = "movieId";
-
         //Movietitle
         public static final String COLUMN_MOVIE_TITLE = "original_title";
 
-        //Movie overview
-        public static final String COLUMN_MOVIE_OVERVIEW = "overview";
-
-        //RELEASEDATE of movie
-        public static final String COLUMN_MOVIE_RELEASEDATE = "release_date";
+        //backdrop Image of movie
+        public static final String COLUMN_MOVIE_BACKDROPPATH = "backdropPath";
 
         //POSTER Image of movie
         public static final String COLUMN_MOVIE_POSTERPATH = "poster_path";
 
+        //RELEASEDATE of movie
+        public static final String COLUMN_MOVIE_RELEASEDATE = "release_date";
+
         //Average vote of movie
         public static final String COLUMN_MOVIE_AVERAGEVOTE = "vote_average";
+
+
+        //Movie overview
+        public static final String COLUMN_MOVIE_OVERVIEW = "overview";
+
+        //Id of movie
+        public static final String COLUMN_MOVIE_ID = "movieId";
 
 
         public static Uri buildMovieUri(long id) {

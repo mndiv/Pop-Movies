@@ -24,26 +24,26 @@ public class MovieDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         final String SQL_CREATE_POPULARITY_TABLE= "CREATE TABLE " + MoviePopularityEntry.TABLE_NAME + " (" +
                 MoviePopularityEntry._ID + " INTEGER PRIMARY KEY," +
-                MoviePopularityEntry.COLUMN_MOVIE_BACKDROPPATH + " TEXT NOT NULL, " +
-                MoviePopularityEntry.COLUMN_MOVIE_ID + " TEXT UNIQUE NOT NULL, " +
                 MoviePopularityEntry.COLUMN_MOVIE_TITLE + " TEXT NOT NULL, " +
-                MoviePopularityEntry.COLUMN_MOVIE_OVERVIEW + " TEXT NOT NULL, " +
-                MoviePopularityEntry.COLUMN_MOVIE_RELEASEDATE + " TEXT NOT NULL, " +
-                MoviePopularityEntry.COLUMN_MOVIE_POSTERPATH + " TEXT NOT NULL, " +
-                MoviePopularityEntry.COLUMN_MOVIE_AVERAGEVOTE + " REAL NOT NULL " +
+                MoviePopularityEntry.COLUMN_MOVIE_BACKDROPPATH + " TEXT , " +
+                MoviePopularityEntry.COLUMN_MOVIE_POSTERPATH + " TEXT , " +
+                MoviePopularityEntry.COLUMN_MOVIE_RELEASEDATE + " TEXT , " +
+                MoviePopularityEntry.COLUMN_MOVIE_AVERAGEVOTE + " REAL , " +
+                MoviePopularityEntry.COLUMN_MOVIE_OVERVIEW + " TEXT , " +
+                MoviePopularityEntry.COLUMN_MOVIE_ID + " TEXT UNIQUE NOT NULL " +
                 " );";
 
         Log.d(DATABASE_NAME, "Create popularity table statement : " + SQL_CREATE_POPULARITY_TABLE);
 
         final String SQL_CREATE_VOTE_TABLE= "CREATE TABLE " + MovieVoteAverageEntry.TABLE_NAME + " (" +
                 MovieVoteAverageEntry._ID + " INTEGER PRIMARY KEY," +
-                MovieVoteAverageEntry.COLUMN_MOVIE_BACKDROPPATH + " TEXT, " +
-                MovieVoteAverageEntry.COLUMN_MOVIE_ID + " TEXT UNIQUE NOT NULL, " +
                 MovieVoteAverageEntry.COLUMN_MOVIE_TITLE + " TEXT NOT NULL, " +
-                MovieVoteAverageEntry.COLUMN_MOVIE_OVERVIEW + " TEXT, " +
-                MovieVoteAverageEntry.COLUMN_MOVIE_RELEASEDATE + " TEXT, " +
-                MovieVoteAverageEntry.COLUMN_MOVIE_POSTERPATH + " TEXT, " +
-                MovieVoteAverageEntry.COLUMN_MOVIE_AVERAGEVOTE + " REAL " +
+                MovieVoteAverageEntry.COLUMN_MOVIE_BACKDROPPATH + " TEXT , " +
+                MovieVoteAverageEntry.COLUMN_MOVIE_POSTERPATH + " TEXT , " +
+                MovieVoteAverageEntry.COLUMN_MOVIE_RELEASEDATE + " TEXT , " +
+                MovieVoteAverageEntry.COLUMN_MOVIE_AVERAGEVOTE + " REAL , " +
+                MovieVoteAverageEntry.COLUMN_MOVIE_OVERVIEW + " TEXT , " +
+                MovieVoteAverageEntry.COLUMN_MOVIE_ID + " TEXT UNIQUE NOT NULL " +
                 " );";
 
         Log.d(DATABASE_NAME, "Create vote table statement : " + SQL_CREATE_VOTE_TABLE);

@@ -3,6 +3,7 @@ package com.divya.android.movies.popmovies;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -11,9 +12,14 @@ import com.facebook.stetho.Stetho;
 
 public class MainActivity extends AppCompatActivity {
 
+    private String sortInfo;
+    protected final String TAG = getClass().getSimpleName();
+    private static final String DETAILFRAGMENT_TAG = "DFTAG";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sortInfo = Utility.getSortOption(this);
         setContentView(R.layout.activity_main);
         Stetho.initialize(
                 Stetho.newInitializerBuilder(this)
@@ -47,5 +53,22 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        String sortBy = Utility.getSortOption(this);
+        Log.d(TAG,"sortIn Main : "+sortBy);
+        if(!sortBy.equals(sortInfo)){
+            PopularMovieListFragment pmf = (PopularMovieListFragment)getSupportFragmentManager().findFragmentById(R.id.fragment);
+            if(null != pmf)
+                pmf.onSettingsChanged();
+
+
+            sortInfo = sortBy;
+        }
+
     }
 }
