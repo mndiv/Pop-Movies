@@ -28,13 +28,13 @@
 
             <TextView
                 android:id="@+id/info_text"
-                android:layout_width="100dp"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:layout_below = "@+id/trailer_key"
                 android:textSize="16sp"
-                android:ellipsize="none"
-                android:singleLine="false"
-                android:minLines = "2"/>
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:maxLines = "1"/>
         </RelativeLayout>
     </android.support.v7.widget.CardView>
 

@@ -19,4 +19,5 @@
     <string name="pref_sortby_rating" translatable="false">vote_average.desc</string>
     <string name="reviews">Reviews</string>
     <string name="noReviews">No Reviews  "\n\n\n\n"</string>
+    <string name="no_data_available">No Trailers</string>
 </resources>

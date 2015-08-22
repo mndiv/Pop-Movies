@@ -57,6 +57,7 @@ public class MovieDetailFragment extends Fragment
     private TextView userRating;
     private TextView overview;
     RecyclerView recList;
+    TextView emptyView;
     private static final int DETAIL_LOADER = 0;
 
 
@@ -145,6 +146,15 @@ public class MovieDetailFragment extends Fragment
             @Override
             public void success(final ResultVideos resultVideos, Response response) {
                 Log.d(TAG, "No. of Trailers : " + resultVideos.getResults().size());
+                if(resultVideos.getResults().size() == 0){
+                    recList.setVisibility(View.GONE);
+                    emptyView.setVisibility(View.VISIBLE);
+                }
+                else{
+                    recList.setVisibility(View.VISIBLE);
+                    emptyView.setVisibility(View.GONE);
+                }
+
                 RVAdapter adapter = new RVAdapter(resultVideos);
                 recList.setAdapter(adapter);
             }
@@ -209,6 +219,7 @@ public class MovieDetailFragment extends Fragment
         userRating = (TextView) rootView.findViewById(R.id.userRating);
         overview = (TextView) rootView.findViewById(R.id.overview);
         recList = (RecyclerView) rootView.findViewById(R.id.trailersList);
+        emptyView = (TextView) rootView.findViewById(R.id.empty_view);
         reviews = (TextView) rootView.findViewById(R.id.reviews);
 
         rootLayout = (CoordinatorLayout) rootView.findViewById(R.id.rootLayout);
