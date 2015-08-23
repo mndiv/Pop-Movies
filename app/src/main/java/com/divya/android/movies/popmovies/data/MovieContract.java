@@ -61,9 +61,21 @@ public class MovieContract {
 
         //Id of movie
         public static final String COLUMN_MOVIE_ID = "movieId";
+        public static String COLUMN_MOVIE_FAV = "favorite";
 
         public static Uri buildMovieUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static Uri buildFavMovieList() {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(COLUMN_MOVIE_FAV).build();
+        }
+
+        public static int getFavValue(Uri uri) {
+            String favString = uri.getQueryParameter(COLUMN_MOVIE_FAV);
+
+            return Integer.parseInt(favString);
         }
     }
 
@@ -102,12 +114,16 @@ public class MovieContract {
 
         //Id of movie
         public static final String COLUMN_MOVIE_ID = "movieId";
+        public static String COLUMN_MOVIE_FAV = "favorite";
 
 
         public static Uri buildMovieUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-
+        public static Uri buildFavMovieList() {
+            return CONTENT_URI.buildUpon()
+                    .appendQueryParameter(COLUMN_MOVIE_FAV, "1").build();
+        }
     }
 }

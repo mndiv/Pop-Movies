@@ -30,7 +30,8 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 MoviePopularityEntry.COLUMN_MOVIE_RELEASEDATE + " TEXT , " +
                 MoviePopularityEntry.COLUMN_MOVIE_AVERAGEVOTE + " REAL , " +
                 MoviePopularityEntry.COLUMN_MOVIE_OVERVIEW + " TEXT , " +
-                MoviePopularityEntry.COLUMN_MOVIE_ID + " TEXT UNIQUE NOT NULL " +
+                MoviePopularityEntry.COLUMN_MOVIE_ID + " TEXT UNIQUE NOT NULL ," +
+                MoviePopularityEntry.COLUMN_MOVIE_FAV + " INT   " +
                 " );";
 
         Log.d(DATABASE_NAME, "Create popularity table statement : " + SQL_CREATE_POPULARITY_TABLE);
@@ -43,7 +44,8 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 MovieVoteAverageEntry.COLUMN_MOVIE_RELEASEDATE + " TEXT , " +
                 MovieVoteAverageEntry.COLUMN_MOVIE_AVERAGEVOTE + " REAL , " +
                 MovieVoteAverageEntry.COLUMN_MOVIE_OVERVIEW + " TEXT , " +
-                MovieVoteAverageEntry.COLUMN_MOVIE_ID + " TEXT UNIQUE NOT NULL " +
+                MovieVoteAverageEntry.COLUMN_MOVIE_ID + " TEXT UNIQUE NOT NULL , " +
+                MoviePopularityEntry.COLUMN_MOVIE_FAV + " INT  " +
                 " );";
 
         Log.d(DATABASE_NAME, "Create vote table statement : " + SQL_CREATE_VOTE_TABLE);

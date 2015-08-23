@@ -14,9 +14,13 @@
 
     <string name="pref_sorby_label_popular">Most Popular</string>
     <string name="pref_sortby_label_rating">Highest Rating</string>
+    <string name="pref_sortby_label_favorite">Favorites</string>
+
 
     <string name="pref_sortby_popular" translatable="false">popularity.desc</string>
     <string name="pref_sortby_rating" translatable="false">vote_average.desc</string>
+    <string name="pref_sortby_favorite" translatable = "false">favorite</string>
+
     <string name="reviews">Reviews</string>
     <string name="noReviews">No Reviews  "\n\n\n\n"</string>
     <string name="no_data_available">No Trailers</string>

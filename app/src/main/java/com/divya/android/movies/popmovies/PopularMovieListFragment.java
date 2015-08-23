@@ -61,33 +61,29 @@ public class PopularMovieListFragment extends Fragment
     }
 
 
+
     // since we read the location when we create the loader, all we need to do is restart things
     void onSettingsChanged( ) {
         sortBy = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
-        if (sortBy.equals(getString(R.string.pref_sortby_default))) {
-            mUri = MoviePopularityEntry.CONTENT_URI;
-            mUriId = MoviePopularityEntry._ID;
-        } else {
-            mUri = MovieVoteAverageEntry.CONTENT_URI;
-            mUriId = MovieVoteAverageEntry._ID;
+        if(sortBy.equals(getString(R.string.pref_sortby_favorite))){
+
+            mUri = MoviePopularityEntry.buildFavMovieList();
         }
-        Log.d(TAG,"mUri in SettingsChanged function : " + mUri);
-        updateMovieList();
+        else {
+            if (sortBy.equals(getString(R.string.pref_sortby_default))) {
+                mUri = MoviePopularityEntry.CONTENT_URI;
+                mUriId = MoviePopularityEntry._ID;
+            } else {
+                mUri = MovieVoteAverageEntry.CONTENT_URI;
+                mUriId = MovieVoteAverageEntry._ID;
+            }
+
+            updateMovieList();
+        }
+        Log.d(TAG, "mUri in SettingsChanged function : " + mUri);
+
         getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
     }
-
-    private void registerPreferenceListener() {
-        listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
-            @Override
-            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                updateMovieList();
-
-            }
-        };
-        sharedPrefs.registerOnSharedPreferenceChangeListener(listener);
-
-    }
-
     /*
         long addMovie(String backdropPath, String id, String originalTitle,
                       String posterPath, String overview, String releaseDate,
@@ -140,7 +136,7 @@ public class PopularMovieListFragment extends Fragment
 
         String api_key = "2fc475941d44b7da433d1f18e24e2551";
         //String api_key = ; /*Please use your own api_key for moviedb*/
-        Log.d(TAG,"mUri in SettingsChanged function : " + mUri);
+        Log.d(TAG, "mUri in SettingsChanged function : " + mUri);
 
         service.getMovieDataFromApi(sortBy, api_key, new Callback<Results>() {
             @Override
@@ -160,6 +156,7 @@ public class PopularMovieListFragment extends Fragment
                         movieValues.put(MoviePopularityEntry.COLUMN_MOVIE_OVERVIEW, results.getResults().get(i).getOverview());
                         movieValues.put(MoviePopularityEntry.COLUMN_MOVIE_RELEASEDATE, results.getResults().get(i).getReleaseDate());
                         movieValues.put(MoviePopularityEntry.COLUMN_MOVIE_AVERAGEVOTE, results.getResults().get(i).getVoteAverage());
+                        movieValues.put(MoviePopularityEntry.COLUMN_MOVIE_FAV, 0);
 
                         cVVector.add(movieValues);
 
@@ -180,6 +177,7 @@ public class PopularMovieListFragment extends Fragment
                         movieValues.put(MovieVoteAverageEntry.COLUMN_MOVIE_OVERVIEW, results.getResults().get(i).getOverview());
                         movieValues.put(MovieVoteAverageEntry.COLUMN_MOVIE_RELEASEDATE, results.getResults().get(i).getReleaseDate());
                         movieValues.put(MovieVoteAverageEntry.COLUMN_MOVIE_AVERAGEVOTE, results.getResults().get(i).getVoteAverage());
+                        movieValues.put(MovieVoteAverageEntry.COLUMN_MOVIE_FAV, 0);
 
                         cVVector.add(movieValues);
                         mUri = MovieVoteAverageEntry.CONTENT_URI;
@@ -196,19 +194,6 @@ public class PopularMovieListFragment extends Fragment
                     inserted = getActivity().getContentResolver().bulkInsert(mUri, cvArray);
                 }
                 Log.d(TAG, "PopMovies Complete. " + inserted + " Inserted");
-               /* imageAdapter = new ImageAdapter(getActivity(), results);
-                imageAdapter.notifyDataSetChanged();
-                gridView.setAdapter(imageAdapter);
-                gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        MovieInfo obj = (MovieInfo) imageAdapter.getItem(position);
-                        Log.d(TAG,"id: " +obj.getBackdropPath());
-                        Intent intent = new Intent(getActivity(), MovieDetail.class);
-                        intent.putExtra("MovieInfo", obj);
-                        startActivity(intent);
-                    }
-                });*/
             }
 
             @Override
@@ -219,26 +204,8 @@ public class PopularMovieListFragment extends Fragment
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-    }
-
-    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         Log.d(TAG, "onActivityCreated");
-
-/*
-        Cursor c =
-                getActivity().getContentResolver().query(mUri,
-                        new String[]{mUriId},
-                        null,
-                        null,
-                        null);
-
-
-        if (c.getCount() == 0) {
-            updateMovieList();
-        }*/
 
         // initialize loader
         getLoaderManager().initLoader(MOVIE_LOADER, null, this);
@@ -262,21 +229,26 @@ public class PopularMovieListFragment extends Fragment
 
         // Log.v(TAG,"onCreateView()");
 
-        //Obtain the gridView ID . where rootView inflates the fragment_main.xml
-
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         sortBy = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
-        if (sortBy.equals(getString(R.string.pref_sortby_default))) {
-            mUri = MoviePopularityEntry.CONTENT_URI;
-            mUriId = MoviePopularityEntry._ID;
-        } else {
-            mUri = MovieVoteAverageEntry.CONTENT_URI;
-            mUriId = MovieVoteAverageEntry._ID;
+        if(sortBy.equals(getString(R.string.pref_sortby_favorite))){
+
+            mUri = MoviePopularityEntry.buildFavMovieList();
         }
-        service = ApiClient.MovieDataApiInterface();
-        updateMovieList();
+        else {
+            if (sortBy.equals(getString(R.string.pref_sortby_default))) {
+                mUri = MoviePopularityEntry.CONTENT_URI;
+                mUriId = MoviePopularityEntry._ID;
+            } else {
+                mUri = MovieVoteAverageEntry.CONTENT_URI;
+                mUriId = MovieVoteAverageEntry._ID;
+            }
+            service = ApiClient.MovieDataApiInterface();
+            updateMovieList();
+        }
+
+
         gridView.setAdapter(mMovieAdapter);
-        //registerPreferenceListener();
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -284,10 +256,8 @@ public class PopularMovieListFragment extends Fragment
                 // increment the position to match Database Ids indexed starting at 1
                 int uriId = position + 1;
                 Uri uri;
-
                 // append Id to uri
                 uri = ContentUris.withAppendedId(mUri,uriId);
-
 
                 Intent intent = new Intent(getActivity(), MovieDetail.class);
                 UriData obj = new UriData(uriId, uri);
@@ -302,13 +272,6 @@ public class PopularMovieListFragment extends Fragment
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelable("KEY_RESULTS_LIST", res);
         super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onDestroy() {
-        //Log.v(TAG,"onDestroy() is called");
-        sharedPrefs.unregisterOnSharedPreferenceChangeListener(listener);
-        super.onDestroy();
     }
 
     // Attach loader to our flavors database query
@@ -336,49 +299,4 @@ public class PopularMovieListFragment extends Fragment
     public void onLoaderReset(Loader<Cursor> loader) {
         mMovieAdapter.swapCursor(null);
     }
-
-
-    /*
-    public class ImageAdapter extends BaseAdapter {
-        private final String LOG_TAG = ImageAdapter.class.getSimpleName();
-        private Context mContext;
-        private Results mResults;
-
-        //Constructor which takes context as inputs
-        public ImageAdapter(Context context, Results results) {
-            mContext = context;
-            mResults = results;
-        }
-
-        @Override
-        //return the no. of Views to be displayed
-        public int getCount() {
-            return mResults.getResults().size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return mResults.getResults().get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return 0;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ImageView view = (ImageView) convertView;
-            if (view == null) {
-                view = new ImageView(mContext);
-                view.setLayoutParams(new GridView.LayoutParams(300, 300));
-            }
-
-            //Picasso easily load album art thumbnails into your views ...
-            //Picasso will handle loading the images on a background thread, image decompression and caching the images.
-            //Fetches Images and load them into Views
-            Picasso.with(mContext).load(mResults.getResults().get(position).getPosterPath()).into(view);
-            return view;
-        }
-    }*/
 }

@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
 /**
@@ -22,22 +23,40 @@ public class MovieProvider extends ContentProvider {
     static final int VOTE = 200;
     private static final int POPULAR_WITH_ID = 300;
     private static final int VOTE_WITH_ID = 400;
+    private static final int FAV_MOVIES = 500;
 
-    /* private static final SQLiteQueryBuilder smovieQueryBuilder;
+    private static final SQLiteQueryBuilder smovieQueryBuilder;
 
-     static{
-         smovieQueryBuilder = new SQLiteQueryBuilder();
+    static {
+        smovieQueryBuilder = new SQLiteQueryBuilder();
 
-         //This is an inner join which looks like
-         //weather INNER JOIN location ON weather.location_id = location._id
-         smovieQueryBuilder.setTables(
-                 MovieContract.MovieEntry.TABLE_NAME + " INNER JOIN " +
-                         MovieContract.LocationEntry.TABLE_NAME +
-                         " ON " + MovieContract.WeatherEntry.TABLE_NAME +
-                         "." + MovieContract.WeatherEntry.COLUMN_LOC_KEY +
-                         " = " + MovieContract.LocationEntry.TABLE_NAME +
-                         "." + MovieContract.LocationEntry._ID);
-     }*/
+        smovieQueryBuilder.setTables(
+                MovieContract.MoviePopularityEntry.TABLE_NAME);
+    }
+
+    //location.location_setting = ?
+    private static final String sFavSelection = MovieContract.MoviePopularityEntry.COLUMN_MOVIE_FAV + " = ? ";
+
+    private Cursor getMovieByFav(Uri uri, String[] projection) {
+
+
+        String[] selectionArgs;
+        String selection;
+
+        selectionArgs = new String[]{Integer.toString(1)};
+        selection = sFavSelection;
+
+
+        return smovieQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                null
+        );
+    }
+
     private static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = MovieContract.CONTENT_AUTHORITY;
@@ -46,7 +65,9 @@ public class MovieProvider extends ContentProvider {
         matcher.addURI(authority, MovieContract.PATH_POPULARITY, POPULAR);
         matcher.addURI(authority, MovieContract.PATH_POPULARITY + "/#", POPULAR_WITH_ID);
         matcher.addURI(authority, MovieContract.PATH_VOTE, VOTE);
-        matcher.addURI(authority, MovieContract.PATH_VOTE + "/#", VOTE_WITH_ID);
+        matcher.addURI(authority, MovieContract.PATH_VOTE + "/#", VOTE_WITH_ID); //path followed by a number
+        matcher.addURI(authority, MovieContract.PATH_POPULARITY + "/*", FAV_MOVIES); //path followed by a string
+        matcher.addURI(authority, MovieContract.PATH_VOTE + "/*", FAV_MOVIES); //path followed by a string
         return matcher;
     }
 
@@ -92,7 +113,7 @@ public class MovieProvider extends ContentProvider {
                         MovieContract.MoviePopularityEntry.TABLE_NAME,
                         projection,
                         MovieContract.MoviePopularityEntry._ID + " = ?",
-                        new String[] {String.valueOf(ContentUris.parseId(uri))},
+                        new String[]{String.valueOf(ContentUris.parseId(uri))},
                         null,
                         null,
                         sortOrder
@@ -100,19 +121,23 @@ public class MovieProvider extends ContentProvider {
                 break;
             }
 
-            case VOTE_WITH_ID
-                    : {
+            case VOTE_WITH_ID: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         MovieContract.MovieVoteAverageEntry.TABLE_NAME,
                         projection,
                         MovieContract.MovieVoteAverageEntry._ID + " = ?",
-                        new String[] {String.valueOf(ContentUris.parseId(uri))},
+                        new String[]{String.valueOf(ContentUris.parseId(uri))},
                         null,
                         null,
                         sortOrder
                 );
                 break;
             }
+            case FAV_MOVIES: {
+                retCursor = getMovieByFav(uri, projection);
+                break;
+            }
+
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -126,11 +151,6 @@ public class MovieProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
 
         switch (match) {
-            // Student: Uncomment and fill out these two cases
-            /*case WEATHER_WITH_LOCATION_AND_DATE:
-                return WeatherContract.WeatherEntry.CONTENT_ITEM_TYPE;
-            case WEATHER_WITH_LOCATION:
-                return WeatherContract.WeatherEntry.CONTENT_TYPE;*/
             case POPULAR:
                 return MovieContract.MoviePopularityEntry.CONTENT_TYPE;
             case VOTE:
@@ -140,6 +160,8 @@ public class MovieProvider extends ContentProvider {
                 return MovieContract.MoviePopularityEntry.CONTENT_ITEM_TYPE;
             case VOTE_WITH_ID:
                 return MovieContract.MovieVoteAverageEntry.CONTENT_ITEM_TYPE;
+            case FAV_MOVIES:
+                return MovieContract.MoviePopularityEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -245,14 +267,14 @@ public class MovieProvider extends ContentProvider {
                 rowsUpdated = db.update(MovieContract.MoviePopularityEntry.TABLE_NAME,
                         values,
                         MovieContract.MoviePopularityEntry._ID + " = ?",
-                        new String[] {String.valueOf(ContentUris.parseId(uri))});
+                        new String[]{String.valueOf(ContentUris.parseId(uri))});
                 break;
             case VOTE_WITH_ID:
                 //normalizeDate(values);
                 rowsUpdated = db.update(MovieContract.MovieVoteAverageEntry.TABLE_NAME,
                         values,
                         MovieContract.MovieVoteAverageEntry._ID + " = ?",
-                        new String[] {String.valueOf(ContentUris.parseId(uri))});
+                        new String[]{String.valueOf(ContentUris.parseId(uri))});
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
