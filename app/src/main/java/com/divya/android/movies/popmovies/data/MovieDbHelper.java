@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.divya.android.movies.popmovies.data.MovieContract.MoviePopularityEntry;
 import com.divya.android.movies.popmovies.data.MovieContract.MovieVoteAverageEntry;
+import com.divya.android.movies.popmovies.data.MovieContract.FavMovieEntry;
 
 /**
  * Created by DivyaM on 8/16/2015.
@@ -50,9 +51,24 @@ public class MovieDbHelper extends SQLiteOpenHelper {
 
         Log.d(DATABASE_NAME, "Create vote table statement : " + SQL_CREATE_VOTE_TABLE);
 
+        final String SQL_CREATE_FAV_TABLE= "CREATE TABLE " + FavMovieEntry.TABLE_NAME + " (" +
+                FavMovieEntry._ID + " INTEGER PRIMARY KEY," +
+                FavMovieEntry.COLUMN_MOVIE_TITLE + " TEXT NOT NULL, " +
+                FavMovieEntry.COLUMN_MOVIE_BACKDROPPATH + " TEXT , " +
+                FavMovieEntry.COLUMN_MOVIE_POSTERPATH + " TEXT , " +
+                FavMovieEntry.COLUMN_MOVIE_RELEASEDATE + " TEXT , " +
+                FavMovieEntry.COLUMN_MOVIE_AVERAGEVOTE + " REAL , " +
+                FavMovieEntry.COLUMN_MOVIE_OVERVIEW + " TEXT , " +
+                FavMovieEntry.COLUMN_MOVIE_ID + " TEXT UNIQUE NOT NULL  " +
+                " );";
+
+        Log.d(DATABASE_NAME, "Create FAV table statement : " + SQL_CREATE_FAV_TABLE);
+
+
 
         sqLiteDatabase.execSQL(SQL_CREATE_POPULARITY_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_VOTE_TABLE);
+        sqLiteDatabase.execSQL(SQL_CREATE_FAV_TABLE);
 
     }
 
@@ -66,6 +82,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
         // should be your top priority before modifying this method.
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MoviePopularityEntry.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieVoteAverageEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + FavMovieEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
 }

@@ -26,6 +26,7 @@ public class MovieContract {
     // At least, let's hope not.  Don't be that dev, reader.  Don't be that dev.
     public static final String PATH_POPULARITY = "popular";
     public static final String PATH_VOTE = "vote";
+    public static final String PATH_FAV = "favorite";
 
     public static final class MoviePopularityEntry implements BaseColumns {
         public static final Uri CONTENT_URI =
@@ -127,6 +128,48 @@ public class MovieContract {
         }
 
 
+    }
+
+    public static final class FavMovieEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_FAV).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAV;
+
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAV;
+
+        // Table name
+        public static final String TABLE_NAME = "favorite";
+
+        //Movietitle
+        public static final String COLUMN_MOVIE_TITLE = "original_title";
+
+        //backdrop Image of movie
+        public static final String COLUMN_MOVIE_BACKDROPPATH = "backdropPath";
+
+        //POSTER Image of movie
+        public static final String COLUMN_MOVIE_POSTERPATH = "poster_path";
+
+        //RELEASEDATE of movie
+        public static final String COLUMN_MOVIE_RELEASEDATE = "release_date";
+
+        //Average vote of movie
+        public static final String COLUMN_MOVIE_AVERAGEVOTE = "vote_average";
+
+
+        //Movie overview
+        public static final String COLUMN_MOVIE_OVERVIEW = "overview";
+
+        //Id of movie
+        public static final String COLUMN_MOVIE_ID = "movieId";
+
+
+        public static Uri buildMovieUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
     }
 
 }

@@ -1,5 +1,6 @@
 package com.divya.android.movies.popmovies;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -27,6 +28,7 @@ import android.widget.TextView;
 import com.divya.android.movies.popmovies.api.ApiClient;
 import com.divya.android.movies.popmovies.api.GetMovieDataApi;
 import com.divya.android.movies.popmovies.data.MovieContract;
+import com.divya.android.movies.popmovies.data.MovieContract.FavMovieEntry;
 import com.divya.android.movies.popmovies.model.ResultReviews;
 import com.divya.android.movies.popmovies.model.ResultVideos;
 import com.divya.android.movies.popmovies.model.UriData;
@@ -68,6 +70,7 @@ public class MovieDetailFragment extends Fragment
     TextView reviews;
 
     String api_key = "2fc475941d44b7da433d1f18e24e2551";
+    private Cursor movieDetailCursor;
 
     //String api_key = ; /*Please use your own api_key for moviedb*/
 
@@ -197,7 +200,7 @@ public class MovieDetailFragment extends Fragment
         });
     }
 
-   public void addMovieFav(){
+   public void addMovieFavValue(){
         ContentValues values = new ContentValues();
 
         values.put(MovieContract.MoviePopularityEntry.COLUMN_MOVIE_FAV, favValue);
@@ -241,27 +244,14 @@ public class MovieDetailFragment extends Fragment
 
 
 
-        fabBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (favValue == 0) {
-                    fabBtn.setImageResource(R.drawable.ic_star_white);
-                    favValue = 1;
-                }
-                else {
-                    fabBtn.setImageResource(R.drawable.ic_star_border_white);
-                    favValue = 0;
-                }
-                addMovieFav();
-            }
-        });
+
         return rootView;
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args){
         String selection = null;
-        String [] selectionArgs = null;
+        String[] selectionArgs = null;
 
 
         Log.d(TAG, "mUri in DetailFragment :" + mUri);
@@ -279,43 +269,48 @@ public class MovieDetailFragment extends Fragment
     }
 
 
-   /* long addMovieFav() {
+    long addMovieFav() {
         long movieLocationId = 0;
 
 
-        if (movieCursor.moveToFirst()) {
-            int movieIdIndex = movieCursor.getColumnIndex(MovieContract.MovieEntry._ID);
-            movieLocationId = movieCursor.getLong(movieIdIndex);
-        } else {
-            // Now that the content provider is set up, inserting rows of data is pretty simple.
-            // First create a ContentValues object to hold the data you want to insert.
-            ContentValues movieValues = new ContentValues();
+        // Now that the content provider is set up, inserting rows of data is pretty simple.
+        // First create a ContentValues object to hold the data you want to insert.
+        ContentValues movieValues = new ContentValues();
 
-            // Then add the data, along with the corresponding name of the data type,
-            // so the content provider knows what kind of value is being inserted.
-            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_BACKDROPPATH, backdropPath);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, id);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE, originalTitle);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_POSTERPATH, posterPath);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_OVERVIEW, overview);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_RELEASEDATE, releaseDate);
-            movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_AVERAGEVOTE, voteAverage);
+        // Then add the data, along with the corresponding name of the data type,
+        // so the content provider knows what kind of value is being inserted.
+        movieValues.put(FavMovieEntry.COLUMN_MOVIE_BACKDROPPATH, movieDetailCursor.getString(movieDetailCursor.getColumnIndex("backdropPath")));
+        movieValues.put(FavMovieEntry.COLUMN_MOVIE_ID, movieDetailCursor.getString(movieDetailCursor.getColumnIndex("movieId")));
+        movieValues.put(FavMovieEntry.COLUMN_MOVIE_TITLE, movieDetailCursor.getString(movieDetailCursor.getColumnIndex("original_title")));
+        movieValues.put(FavMovieEntry.COLUMN_MOVIE_POSTERPATH, movieDetailCursor.getString(movieDetailCursor.getColumnIndex("poster_path")));
+        movieValues.put(FavMovieEntry.COLUMN_MOVIE_OVERVIEW, movieDetailCursor.getString(movieDetailCursor.getColumnIndex("overview")));
+        movieValues.put(FavMovieEntry.COLUMN_MOVIE_RELEASEDATE, movieDetailCursor.getString(movieDetailCursor.getColumnIndex("release_date")));
+        movieValues.put(FavMovieEntry.COLUMN_MOVIE_AVERAGEVOTE, movieDetailCursor.getDouble(movieDetailCursor.getColumnIndex("vote_average")));
 
 
-            // Finally, insert location data into the database.
-            Uri insertedUri =  getActivity().getContentResolver().insert(
-                    MovieContract.MovieEntry.CONTENT_URI,
-                    movieValues
-            );
+        // Finally, insert location data into the database.
+        Uri insertedUri = getActivity().getContentResolver().insert(
+                FavMovieEntry.CONTENT_URI,
+                movieValues
+        );
 
-            // The resulting URI contains the ID for the row.  Extract the locationId from the Uri.
-            movieLocationId = ContentUris.parseId(insertedUri);
-        }
+        // The resulting URI contains the ID for the row.  Extract the locationId from the Uri.
+        movieLocationId = ContentUris.parseId(insertedUri);
 
 
-        movieCursor.close();
+
         return movieLocationId;
-    }*/
+    }
+
+    void removeMovieFav() {
+        // First, check if the location with this city name exists in the db
+        int rowsDeleted = getActivity().getContentResolver().delete(
+                MovieContract.FavMovieEntry.CONTENT_URI,
+                MovieContract.FavMovieEntry.COLUMN_MOVIE_ID + " = ?",
+                new String[]{movieDetailCursor.getString(movieDetailCursor.getColumnIndex("movieId"))});
+        Log.d(TAG,"rows deleted: "+rowsDeleted);
+    }
+
 
     // Set the cursor in our CursorAdapter once the Cursor is loaded
     @Override
@@ -323,15 +318,62 @@ public class MovieDetailFragment extends Fragment
 
         mDetailCursor.moveToFirst();
         DatabaseUtils.dumpCursor(mDetailCursor);
+        movieDetailCursor = mDetailCursor;
 
-        colIdx = mDetailCursor.getColumnIndex("favorite");
-        favValue = mDetailCursor.getInt(colIdx);
+//        colIdx = mDetailCursor.getColumnIndex("favorite");
+//        favValue = mDetailCursor.getInt(colIdx);
 
-        if (favValue == 0)
-            fabBtn.setImageResource(R.drawable.ic_star_border_white);
-        else
+//        if (favValue == 0)
+//            fabBtn.setImageResource(R.drawable.ic_star_border_white);
+//        else
+//            fabBtn.setImageResource(R.drawable.ic_star_white);
+
+        final String id = mDetailCursor.getString(mDetailCursor.getColumnIndex("movieId"));
+        Cursor movieCursor = getActivity().getContentResolver().query(
+                MovieContract.FavMovieEntry.CONTENT_URI,
+                new String[]{MovieContract.FavMovieEntry._ID},
+                MovieContract.FavMovieEntry.COLUMN_MOVIE_ID + " = ?",
+                new String[]{id},
+                null);
+        if (movieCursor.moveToFirst()) {
             fabBtn.setImageResource(R.drawable.ic_star_white);
+            favValue = 0;
+        } else {
+            fabBtn.setImageResource(R.drawable.ic_star_border_white);
+            favValue = 1;
+        }
 
+
+        fabBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                long movieLocationId;
+
+                // First, check if the location with this city name exists in the db
+                if (favValue == 0) {
+                    fabBtn.setImageResource(R.drawable.ic_star_border_white);
+                    removeMovieFav();
+                } else {
+                    fabBtn.setImageResource(R.drawable.ic_star_white);
+                    addMovieFav();
+                }
+
+
+//                if (favValue == 0) {
+//                    fabBtn.setImageResource(R.drawable.ic_star_white);
+//                    favValue = 1;
+//                    addMovieFav();
+//                    addMovieFavValue();
+//                }
+//                else {
+//                    fabBtn.setImageResource(R.drawable.ic_star_border_white);
+//                    favValue = 0;
+//                    removeMovieFav();
+//
+//                }
+
+            }
+        });
 
         colIdx = mDetailCursor.getColumnIndex("original_title");
         collapsingToolbarLayout.setTitle(mDetailCursor.getString(colIdx));

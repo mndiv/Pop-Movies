@@ -24,6 +24,8 @@ public class MovieProvider extends ContentProvider {
     private static final int POPULAR_WITH_ID = 300;
     private static final int VOTE_WITH_ID = 400;
     private static final int FAV_MOVIES = 500;
+    private static final int FAV_WITH_ID = 600;
+
 
     private static final SQLiteQueryBuilder smovieQueryBuilder;
 
@@ -74,8 +76,9 @@ public class MovieProvider extends ContentProvider {
         matcher.addURI(authority, MovieContract.PATH_POPULARITY + "/#", POPULAR_WITH_ID);
         matcher.addURI(authority, MovieContract.PATH_VOTE, VOTE);
         matcher.addURI(authority, MovieContract.PATH_VOTE + "/#", VOTE_WITH_ID); //path followed by a number
-        //matcher.addURI(authority, MovieContract.PATH_FAV, FAV_MOVIES);
-        matcher.addURI(authority, MovieContract.PATH_POPULARITY + "/*", FAV_MOVIES); //path followed by a string
+        matcher.addURI(authority, MovieContract.PATH_FAV, FAV_MOVIES);
+        matcher.addURI(authority, MovieContract.PATH_FAV + "/#", FAV_WITH_ID); //path followed by a number
+        //matcher.addURI(authority, MovieContract.PATH_POPULARITY + "/*", FAV_MOVIES); //path followed by a string
         return matcher;
     }
 
@@ -116,6 +119,19 @@ public class MovieProvider extends ContentProvider {
                 );
                 break;
             }
+            case FAV_MOVIES: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        MovieContract.FavMovieEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
+
             case POPULAR_WITH_ID: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         MovieContract.MoviePopularityEntry.TABLE_NAME,
@@ -141,11 +157,24 @@ public class MovieProvider extends ContentProvider {
                 );
                 break;
             }
-            case FAV_MOVIES: {
+            case FAV_WITH_ID: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        MovieContract.FavMovieEntry.TABLE_NAME,
+                        projection,
+                        MovieContract.FavMovieEntry._ID + " = ?",
+                        new String[]{String.valueOf(ContentUris.parseId(uri))},
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
+
+           /* case FAV_MOVIES: {
                 retCursor = getMovieByFav(uri, projection);
                 break;
 
-            }
+            }*/
 
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -169,8 +198,12 @@ public class MovieProvider extends ContentProvider {
                 return MovieContract.MoviePopularityEntry.CONTENT_ITEM_TYPE;
             case VOTE_WITH_ID:
                 return MovieContract.MovieVoteAverageEntry.CONTENT_ITEM_TYPE;
+            /*case FAV_MOVIES:
+                return MovieContract.MoviePopularityEntry.CONTENT_TYPE;*/
             case FAV_MOVIES:
-                return MovieContract.MoviePopularityEntry.CONTENT_TYPE;
+                return MovieContract.FavMovieEntry.CONTENT_TYPE;
+            case FAV_WITH_ID:
+                return MovieContract.FavMovieEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -200,6 +233,17 @@ public class MovieProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
+
+            case FAV_MOVIES: {
+                // normalizeDate(values);
+                long _id = db.insert(MovieContract.FavMovieEntry.TABLE_NAME, null, values);
+                if (_id > 0)
+                    returnUri = MovieContract.FavMovieEntry.buildMovieUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
+
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -228,6 +272,14 @@ public class MovieProvider extends ContentProvider {
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" +
                         MovieContract.MovieVoteAverageEntry.TABLE_NAME + "'");
                 break;
+
+            case FAV_MOVIES:
+                rowsDeleted = db.delete(
+                        MovieContract.FavMovieEntry.TABLE_NAME, selection, selectionArgs);
+                db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" +
+                        MovieContract.FavMovieEntry.TABLE_NAME + "'");
+                break;
+
             case POPULAR_WITH_ID:
                 rowsDeleted = db.delete(
                         MovieContract.MoviePopularityEntry.TABLE_NAME,
@@ -243,6 +295,14 @@ public class MovieProvider extends ContentProvider {
                         new String[]{String.valueOf(ContentUris.parseId(uri))});
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" +
                         MovieContract.MovieVoteAverageEntry.TABLE_NAME + "'");
+                break;
+            case FAV_WITH_ID:
+                rowsDeleted = db.delete(
+                        MovieContract.FavMovieEntry.TABLE_NAME,
+                        MovieContract.FavMovieEntry._ID + " = ?",
+                        new String[]{String.valueOf(ContentUris.parseId(uri))});
+                db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" +
+                        MovieContract.FavMovieEntry.TABLE_NAME + "'");
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -269,6 +329,11 @@ public class MovieProvider extends ContentProvider {
             case VOTE:
                 //normalizeDate(values);
                 rowsUpdated = db.update(MovieContract.MovieVoteAverageEntry.TABLE_NAME, values, selection,
+                        selectionArgs);
+                break;
+            case FAV_MOVIES:
+                //normalizeDate(values);
+                rowsUpdated = db.update(MovieContract.FavMovieEntry.TABLE_NAME, values, selection,
                         selectionArgs);
                 break;
             case POPULAR_WITH_ID:

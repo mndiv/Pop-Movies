@@ -22,6 +22,7 @@ import android.widget.GridView;
 
 import com.divya.android.movies.popmovies.api.ApiClient;
 import com.divya.android.movies.popmovies.api.GetMovieDataApi;
+import com.divya.android.movies.popmovies.data.MovieContract.FavMovieEntry;
 import com.divya.android.movies.popmovies.data.MovieContract.MoviePopularityEntry;
 import com.divya.android.movies.popmovies.data.MovieContract.MovieVoteAverageEntry;
 import com.divya.android.movies.popmovies.model.Results;
@@ -68,7 +69,8 @@ public class PopularMovieListFragment extends Fragment
         sortBy = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
         if(sortBy.equals(getString(R.string.pref_sortby_favorite))){
 
-            mUri = MoviePopularityEntry.buildFavMovieList();
+            mUri = FavMovieEntry.CONTENT_URI;
+            mUriId = FavMovieEntry._ID;
         }
         else {
             if (sortBy.equals(getString(R.string.pref_sortby_default))) {
@@ -234,7 +236,8 @@ public class PopularMovieListFragment extends Fragment
         sortBy = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
         if(sortBy.equals(getString(R.string.pref_sortby_favorite))){
 
-            mUri = MoviePopularityEntry.buildFavMovieList();
+            mUri = FavMovieEntry.CONTENT_URI;
+            mUriId = FavMovieEntry._ID;
         }
         else {
             if (sortBy.equals(getString(R.string.pref_sortby_default))) {
