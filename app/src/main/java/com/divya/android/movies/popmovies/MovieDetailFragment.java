@@ -26,6 +26,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.divya.android.movies.popmovies.api.ApiClient;
 import com.divya.android.movies.popmovies.api.GetMovieDataApi;
@@ -209,7 +210,7 @@ public class MovieDetailFragment extends Fragment
         values.put(MovieContract.MoviePopularityEntry.COLUMN_MOVIE_FAV, favValue);
 
         int inserted = getActivity().getContentResolver().update(mUri,values,null,null);
-        Log.d(TAG, "inserted = " + inserted);
+        //Toast.makeText(getActivity(),"Added to Favorites", Toast.LENGTH_SHORT).show();
     }
 
     public void resetMovieFavValue(){
@@ -268,10 +269,13 @@ public class MovieDetailFragment extends Fragment
                     if (favValue == 0) {
                         fabBtn.setImageResource(R.drawable.ic_star_border_white);
                         removeMovieFav();
+                        Toast.makeText(getActivity(),"Removed from Favorites", Toast.LENGTH_SHORT).show();
                         //getActivity().finish();
                     } else {
                         fabBtn.setImageResource(R.drawable.ic_star_white);
                         addMovieFav();
+                        Toast.makeText(getActivity(),"Added to Favorites", Toast.LENGTH_SHORT).show();
+
                     }
 
                 }
@@ -342,7 +346,7 @@ public class MovieDetailFragment extends Fragment
                 MovieContract.FavMovieEntry.CONTENT_URI,
                 MovieContract.FavMovieEntry.COLUMN_MOVIE_ID + " = ?",
                 new String[]{movieDetailCursor.getString(movieDetailCursor.getColumnIndex("movieId"))});
-        Log.d(TAG, "rows deleted: " + rowsDeleted);
+
 
     }
 
