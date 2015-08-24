@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -219,7 +220,7 @@ public class PopularMovieListFragment extends Fragment
         mMovieAdapter = new MovieAdapter(getActivity(), null, 0, MOVIE_LOADER);
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         gridView = (GridView) rootView.findViewById(R.id.gridview);
-        gridView.setAdapter(mMovieAdapter);
+        //gridView.setAdapter(mMovieAdapter);
 
         if (savedInstanceState != null) {
             res = savedInstanceState.getParcelable("KEY_RESULTS_LIST");
@@ -289,6 +290,8 @@ public class PopularMovieListFragment extends Fragment
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
+        data.moveToFirst();
+        DatabaseUtils.dumpCursor(data);
         mMovieAdapter.swapCursor(data);
 
 

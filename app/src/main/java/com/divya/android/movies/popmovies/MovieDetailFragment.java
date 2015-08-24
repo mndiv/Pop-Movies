@@ -60,7 +60,7 @@ public class MovieDetailFragment extends Fragment
     RecyclerView recList;
     TextView emptyView;
     private int colIdx;
-    private int favValue = 0;
+    private int favValue;
     private static final int DETAIL_LOADER = 0;
 
 
@@ -220,8 +220,8 @@ public class MovieDetailFragment extends Fragment
         UriData uriObj = data.getParcelable("MovieInfo");
         mUriId = uriObj.getUriId();
         mUri = uriObj.getUri();
-
         Log.d(TAG, "content Uri : " + mUri);
+
         //getLoaderManager().initLoader(MOVIE_LOADER, null, MovieDetailFragment.this);
 
 
@@ -238,6 +238,8 @@ public class MovieDetailFragment extends Fragment
         collapsingToolbarLayout = (CollapsingToolbarLayout) rootView.findViewById(R.id.collapsingToolbarLayout);
 
         fabBtn = (FloatingActionButton) rootView.findViewById(R.id.fabBtn);
+
+
 
         fabBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -325,8 +327,10 @@ public class MovieDetailFragment extends Fragment
         colIdx = mDetailCursor.getColumnIndex("favorite");
         favValue = mDetailCursor.getInt(colIdx);
 
-
-
+        if (favValue == 0)
+            fabBtn.setImageResource(R.drawable.ic_star_border_white);
+        else
+            fabBtn.setImageResource(R.drawable.ic_star_white);
 
 
         colIdx = mDetailCursor.getColumnIndex("original_title");

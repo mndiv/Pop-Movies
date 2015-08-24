@@ -31,11 +31,19 @@ public class MovieProvider extends ContentProvider {
         smovieQueryBuilder = new SQLiteQueryBuilder();
 
         smovieQueryBuilder.setTables(
-                MovieContract.MoviePopularityEntry.TABLE_NAME);
+                MovieContract.MoviePopularityEntry.TABLE_NAME + " INNER JOIN " +
+                       MovieContract.MovieVoteAverageEntry.TABLE_NAME +
+                        " ON " + MovieContract.MoviePopularityEntry.TABLE_NAME +
+                        "." + MovieContract.MoviePopularityEntry.COLUMN_MOVIE_FAV +
+                        " = " + MovieContract.MovieVoteAverageEntry.TABLE_NAME +
+                        "." + MovieContract.MovieVoteAverageEntry.COLUMN_MOVIE_FAV);
+
+              //  MovieContract.MoviePopularityEntry.TABLE_NAME);
     }
 
     //location.location_setting = ?
-    private static final String sFavSelection = MovieContract.MoviePopularityEntry.COLUMN_MOVIE_FAV + " = ? ";
+    private static final String sFavSelection = MovieContract.MoviePopularityEntry.TABLE_NAME+
+                "." + MovieContract.MoviePopularityEntry.COLUMN_MOVIE_FAV + " = ? ";
 
     private Cursor getMovieByFav(Uri uri, String[] projection) {
 
@@ -66,8 +74,8 @@ public class MovieProvider extends ContentProvider {
         matcher.addURI(authority, MovieContract.PATH_POPULARITY + "/#", POPULAR_WITH_ID);
         matcher.addURI(authority, MovieContract.PATH_VOTE, VOTE);
         matcher.addURI(authority, MovieContract.PATH_VOTE + "/#", VOTE_WITH_ID); //path followed by a number
+        //matcher.addURI(authority, MovieContract.PATH_FAV, FAV_MOVIES);
         matcher.addURI(authority, MovieContract.PATH_POPULARITY + "/*", FAV_MOVIES); //path followed by a string
-        matcher.addURI(authority, MovieContract.PATH_VOTE + "/*", FAV_MOVIES); //path followed by a string
         return matcher;
     }
 
@@ -136,6 +144,7 @@ public class MovieProvider extends ContentProvider {
             case FAV_MOVIES: {
                 retCursor = getMovieByFav(uri, projection);
                 break;
+
             }
 
             default:

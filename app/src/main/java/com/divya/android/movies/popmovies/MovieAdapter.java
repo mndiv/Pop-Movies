@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.divya.android.movies.popmovies.data.MovieContract;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -53,12 +52,19 @@ public class MovieAdapter extends CursorAdapter{
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
 
+
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         Log.d(LOG_TAG, "In bind View");
+        String sortOption = Utility.getSortOption(context);
 
-        int imageIndex = cursor.getColumnIndex(MovieContract.MoviePopularityEntry.COLUMN_MOVIE_POSTERPATH);
-        final String image = cursor.getString(imageIndex);
-        Picasso.with(mContext).load(image).into(viewHolder.imageView);
+       // if(sortOption.equals("popularity.desc") || sortOption.equals("vote_average.desc")) {
+            int imageIndex = cursor.getColumnIndex("poster_path");
+            final String image = cursor.getString(imageIndex);
+            Picasso.with(mContext).load(image).into(viewHolder.imageView);
+       // }
+       // else {
+
+       // }
     }
 }

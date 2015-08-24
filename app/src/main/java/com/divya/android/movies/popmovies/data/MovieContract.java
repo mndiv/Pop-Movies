@@ -125,5 +125,8 @@ public class MovieContract {
             return CONTENT_URI.buildUpon()
                     .appendQueryParameter(COLUMN_MOVIE_FAV, "1").build();
         }
+
+
     }
+
 }
