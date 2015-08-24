@@ -276,8 +276,8 @@ public class MovieProvider extends ContentProvider {
             case FAV_MOVIES:
                 rowsDeleted = db.delete(
                         MovieContract.FavMovieEntry.TABLE_NAME, selection, selectionArgs);
-                db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" +
-                        MovieContract.FavMovieEntry.TABLE_NAME + "'");
+                //db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" +
+                  //  MovieContract.FavMovieEntry.TABLE_NAME + "'");
                 break;
 
             case POPULAR_WITH_ID:

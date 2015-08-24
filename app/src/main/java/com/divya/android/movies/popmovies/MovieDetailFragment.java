@@ -3,10 +3,12 @@ package com.divya.android.movies.popmovies;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -28,7 +30,6 @@ import android.widget.TextView;
 import com.divya.android.movies.popmovies.api.ApiClient;
 import com.divya.android.movies.popmovies.api.GetMovieDataApi;
 import com.divya.android.movies.popmovies.data.MovieContract;
-import com.divya.android.movies.popmovies.data.MovieContract.FavMovieEntry;
 import com.divya.android.movies.popmovies.model.ResultReviews;
 import com.divya.android.movies.popmovies.model.ResultVideos;
 import com.divya.android.movies.popmovies.model.UriData;
@@ -64,6 +65,8 @@ public class MovieDetailFragment extends Fragment
     private int colIdx;
     private int favValue;
     private static final int DETAIL_LOADER = 0;
+    Intent intent;
+    String sortBy;
 
 
     private String mPosterPath;
@@ -207,7 +210,16 @@ public class MovieDetailFragment extends Fragment
 
         int inserted = getActivity().getContentResolver().update(mUri,values,null,null);
         Log.d(TAG, "inserted = " + inserted);
-   }
+    }
+
+    public void resetMovieFavValue(){
+        ContentValues values = new ContentValues();
+
+        values.put(MovieContract.MoviePopularityEntry.COLUMN_MOVIE_FAV, favValue);
+
+        int inserted = getActivity().getContentResolver().update(mUri,values,null,null);
+        Log.d(TAG, "reset = " + inserted);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -217,7 +229,7 @@ public class MovieDetailFragment extends Fragment
         toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
 
-        Intent intent = getActivity().getIntent();
+        intent = getActivity().getIntent();
 
         Bundle data = intent.getExtras();
         UriData uriObj = data.getParcelable("MovieInfo");
@@ -241,8 +253,30 @@ public class MovieDetailFragment extends Fragment
         collapsingToolbarLayout = (CollapsingToolbarLayout) rootView.findViewById(R.id.collapsingToolbarLayout);
 
         fabBtn = (FloatingActionButton) rootView.findViewById(R.id.fabBtn);
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        sortBy = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
+
+        if(sortBy.equals("favorite")){
+            fabBtn.setVisibility(View.VISIBLE);
+        }
+        else {
 
 
+            fabBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (favValue == 0) {
+                        fabBtn.setImageResource(R.drawable.ic_star_border_white);
+                        removeMovieFav();
+                        //getActivity().finish();
+                    } else {
+                        fabBtn.setImageResource(R.drawable.ic_star_white);
+                        addMovieFav();
+                    }
+
+                }
+            });
+        }
 
 
         return rootView;
@@ -279,18 +313,18 @@ public class MovieDetailFragment extends Fragment
 
         // Then add the data, along with the corresponding name of the data type,
         // so the content provider knows what kind of value is being inserted.
-        movieValues.put(FavMovieEntry.COLUMN_MOVIE_BACKDROPPATH, movieDetailCursor.getString(movieDetailCursor.getColumnIndex("backdropPath")));
-        movieValues.put(FavMovieEntry.COLUMN_MOVIE_ID, movieDetailCursor.getString(movieDetailCursor.getColumnIndex("movieId")));
-        movieValues.put(FavMovieEntry.COLUMN_MOVIE_TITLE, movieDetailCursor.getString(movieDetailCursor.getColumnIndex("original_title")));
-        movieValues.put(FavMovieEntry.COLUMN_MOVIE_POSTERPATH, movieDetailCursor.getString(movieDetailCursor.getColumnIndex("poster_path")));
-        movieValues.put(FavMovieEntry.COLUMN_MOVIE_OVERVIEW, movieDetailCursor.getString(movieDetailCursor.getColumnIndex("overview")));
-        movieValues.put(FavMovieEntry.COLUMN_MOVIE_RELEASEDATE, movieDetailCursor.getString(movieDetailCursor.getColumnIndex("release_date")));
-        movieValues.put(FavMovieEntry.COLUMN_MOVIE_AVERAGEVOTE, movieDetailCursor.getDouble(movieDetailCursor.getColumnIndex("vote_average")));
+        movieValues.put(MovieContract.FavMovieEntry.COLUMN_MOVIE_BACKDROPPATH, movieDetailCursor.getString(movieDetailCursor.getColumnIndex("backdropPath")));
+        movieValues.put(MovieContract.FavMovieEntry.COLUMN_MOVIE_ID, movieDetailCursor.getString(movieDetailCursor.getColumnIndex("movieId")));
+        movieValues.put(MovieContract.FavMovieEntry.COLUMN_MOVIE_TITLE, movieDetailCursor.getString(movieDetailCursor.getColumnIndex("original_title")));
+        movieValues.put(MovieContract.FavMovieEntry.COLUMN_MOVIE_POSTERPATH, movieDetailCursor.getString(movieDetailCursor.getColumnIndex("poster_path")));
+        movieValues.put(MovieContract.FavMovieEntry.COLUMN_MOVIE_OVERVIEW, movieDetailCursor.getString(movieDetailCursor.getColumnIndex("overview")));
+        movieValues.put(MovieContract.FavMovieEntry.COLUMN_MOVIE_RELEASEDATE, movieDetailCursor.getString(movieDetailCursor.getColumnIndex("release_date")));
+        movieValues.put(MovieContract.FavMovieEntry.COLUMN_MOVIE_AVERAGEVOTE, movieDetailCursor.getDouble(movieDetailCursor.getColumnIndex("vote_average")));
 
 
         // Finally, insert location data into the database.
         Uri insertedUri = getActivity().getContentResolver().insert(
-                FavMovieEntry.CONTENT_URI,
+                MovieContract.FavMovieEntry.CONTENT_URI,
                 movieValues
         );
 
@@ -308,7 +342,8 @@ public class MovieDetailFragment extends Fragment
                 MovieContract.FavMovieEntry.CONTENT_URI,
                 MovieContract.FavMovieEntry.COLUMN_MOVIE_ID + " = ?",
                 new String[]{movieDetailCursor.getString(movieDetailCursor.getColumnIndex("movieId"))});
-        Log.d(TAG,"rows deleted: "+rowsDeleted);
+        Log.d(TAG, "rows deleted: " + rowsDeleted);
+
     }
 
 
@@ -344,36 +379,7 @@ public class MovieDetailFragment extends Fragment
         }
 
 
-        fabBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                long movieLocationId;
 
-                // First, check if the location with this city name exists in the db
-                if (favValue == 0) {
-                    fabBtn.setImageResource(R.drawable.ic_star_border_white);
-                    removeMovieFav();
-                } else {
-                    fabBtn.setImageResource(R.drawable.ic_star_white);
-                    addMovieFav();
-                }
-
-
-//                if (favValue == 0) {
-//                    fabBtn.setImageResource(R.drawable.ic_star_white);
-//                    favValue = 1;
-//                    addMovieFav();
-//                    addMovieFavValue();
-//                }
-//                else {
-//                    fabBtn.setImageResource(R.drawable.ic_star_border_white);
-//                    favValue = 0;
-//                    removeMovieFav();
-//
-//                }
-
-            }
-        });
 
         colIdx = mDetailCursor.getColumnIndex("original_title");
         collapsingToolbarLayout.setTitle(mDetailCursor.getString(colIdx));
@@ -410,11 +416,15 @@ public class MovieDetailFragment extends Fragment
         colIdx = mDetailCursor.getColumnIndex("movieId");
         GetTrailers(mDetailCursor.getString(colIdx));
         GetReviews(mDetailCursor.getString(colIdx));
+
+
+
     }
 
     // reset CursorAdapter on Loader Reset
     @Override
     public void onLoaderReset(Loader<Cursor> loader){
+
         mDetailCursor = null;
     }
 
