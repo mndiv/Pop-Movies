@@ -15,7 +15,7 @@ import com.squareup.picasso.Picasso;
 /**
  * Created by DivyaM on 8/19/2015.
  */
-public class MovieAdapter extends CursorAdapter{
+public class MovieAdapter extends CursorAdapter {
 
     private static final String LOG_TAG = Movie.class.getSimpleName();
     private Context mContext;
@@ -23,9 +23,9 @@ public class MovieAdapter extends CursorAdapter{
 
     public static class ViewHolder {
         public final ImageView imageView;
-       // public final TextView textView;
+        // public final TextView textView;
 
-        public ViewHolder(View view){
+        public ViewHolder(View view) {
             imageView = (ImageView) view.findViewById(R.id.movie_image);
             //textView = (TextView) view.findViewById(R.id.flavor_text);
         }
@@ -58,13 +58,9 @@ public class MovieAdapter extends CursorAdapter{
         Log.d(LOG_TAG, "In bind View");
         String sortOption = Utility.getSortOption(context);
 
-       // if(sortOption.equals("popularity.desc") || sortOption.equals("vote_average.desc")) {
-            int imageIndex = cursor.getColumnIndex("poster_path");
-            final String image = cursor.getString(imageIndex);
-            Picasso.with(mContext).load(image).into(viewHolder.imageView);
-       // }
-       // else {
+        int imageIndex = cursor.getColumnIndex("poster_path");
+        final String image = cursor.getString(imageIndex);
+        Picasso.with(mContext).load(image).into(viewHolder.imageView);
 
-       // }
     }
 }

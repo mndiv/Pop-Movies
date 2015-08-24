@@ -53,9 +53,7 @@ public class MovieDetailFragment extends Fragment
     CollapsingToolbarLayout collapsingToolbarLayout;
     CoordinatorLayout rootLayout;
     FloatingActionButton fabBtn;
-    private int mUriId;
     private Uri mUri;
-    private Cursor mDetailCursor;
     private ImageView backdropView;
     private ImageView posterView;
     private TextView releaseDate;
@@ -74,11 +72,9 @@ public class MovieDetailFragment extends Fragment
     TextView reviews;
 
     String api_key = "2fc475941d44b7da433d1f18e24e2551";
-    private Cursor movieDetailCursor;
-
     //String api_key = ; /*Please use your own api_key for moviedb*/
-
-
+    private Cursor movieDetailCursor;
+    private Cursor mDetailCursor;
 
     public MovieDetailFragment() {
     }
@@ -204,29 +200,13 @@ public class MovieDetailFragment extends Fragment
         });
     }
 
-   public void addMovieFavValue(){
-        ContentValues values = new ContentValues();
-
-        values.put(MovieContract.MoviePopularityEntry.COLUMN_MOVIE_FAV, favValue);
-
-        int inserted = getActivity().getContentResolver().update(mUri,values,null,null);
-        //Toast.makeText(getActivity(),"Added to Favorites", Toast.LENGTH_SHORT).show();
-    }
-
-    public void resetMovieFavValue(){
-        ContentValues values = new ContentValues();
-
-        values.put(MovieContract.MoviePopularityEntry.COLUMN_MOVIE_FAV, favValue);
-
-        int inserted = getActivity().getContentResolver().update(mUri,values,null,null);
-        Log.d(TAG, "reset = " + inserted);
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_details, container, false);
-        //initToolbar();
+
+        //Initialize Toolbar
         toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
 
@@ -234,11 +214,7 @@ public class MovieDetailFragment extends Fragment
 
         Bundle data = intent.getExtras();
         UriData uriObj = data.getParcelable("MovieInfo");
-        mUriId = uriObj.getUriId();
         mUri = uriObj.getUri();
-        Log.d(TAG, "content Uri : " + mUri);
-
-        //getLoaderManager().initLoader(MOVIE_LOADER, null, MovieDetailFragment.this);
 
 
         backdropView = (ImageView)rootView.findViewById(R.id.backdrop_view);
@@ -268,13 +244,12 @@ public class MovieDetailFragment extends Fragment
                 public void onClick(View v) {
                     if (favValue == 0) {
                         fabBtn.setImageResource(R.drawable.ic_star_border_white);
-                        removeMovieFav();
-                        Toast.makeText(getActivity(),"Removed from Favorites", Toast.LENGTH_SHORT).show();
-                        //getActivity().finish();
+                        if(removeMovieFav()!=0)
+                            Toast.makeText(getActivity(),"Removed from Favorites", Toast.LENGTH_SHORT).show();
                     } else {
                         fabBtn.setImageResource(R.drawable.ic_star_white);
-                        addMovieFav();
-                        Toast.makeText(getActivity(),"Added to Favorites", Toast.LENGTH_SHORT).show();
+                        if(addMovieFav()!=0)
+                         Toast.makeText(getActivity(),"Added to Favorites", Toast.LENGTH_SHORT).show();
 
                     }
 
@@ -325,14 +300,12 @@ public class MovieDetailFragment extends Fragment
         movieValues.put(MovieContract.FavMovieEntry.COLUMN_MOVIE_RELEASEDATE, movieDetailCursor.getString(movieDetailCursor.getColumnIndex("release_date")));
         movieValues.put(MovieContract.FavMovieEntry.COLUMN_MOVIE_AVERAGEVOTE, movieDetailCursor.getDouble(movieDetailCursor.getColumnIndex("vote_average")));
 
-
-        // Finally, insert location data into the database.
         Uri insertedUri = getActivity().getContentResolver().insert(
                 MovieContract.FavMovieEntry.CONTENT_URI,
                 movieValues
         );
 
-        // The resulting URI contains the ID for the row.  Extract the locationId from the Uri.
+        // The resulting URI contains the ID for the row.
         movieLocationId = ContentUris.parseId(insertedUri);
 
 
@@ -340,14 +313,11 @@ public class MovieDetailFragment extends Fragment
         return movieLocationId;
     }
 
-    void removeMovieFav() {
-        // First, check if the location with this city name exists in the db
-        int rowsDeleted = getActivity().getContentResolver().delete(
+    int  removeMovieFav() {
+        return (getActivity().getContentResolver().delete(
                 MovieContract.FavMovieEntry.CONTENT_URI,
                 MovieContract.FavMovieEntry.COLUMN_MOVIE_ID + " = ?",
-                new String[]{movieDetailCursor.getString(movieDetailCursor.getColumnIndex("movieId"))});
-
-
+                new String[]{movieDetailCursor.getString(movieDetailCursor.getColumnIndex("movieId"))}));
     }
 
 
@@ -358,14 +328,6 @@ public class MovieDetailFragment extends Fragment
         mDetailCursor.moveToFirst();
         DatabaseUtils.dumpCursor(mDetailCursor);
         movieDetailCursor = mDetailCursor;
-
-//        colIdx = mDetailCursor.getColumnIndex("favorite");
-//        favValue = mDetailCursor.getInt(colIdx);
-
-//        if (favValue == 0)
-//            fabBtn.setImageResource(R.drawable.ic_star_border_white);
-//        else
-//            fabBtn.setImageResource(R.drawable.ic_star_white);
 
         final String id = mDetailCursor.getString(mDetailCursor.getColumnIndex("movieId"));
         Cursor movieCursor = getActivity().getContentResolver().query(
@@ -381,9 +343,6 @@ public class MovieDetailFragment extends Fragment
             fabBtn.setImageResource(R.drawable.ic_star_border_white);
             favValue = 1;
         }
-
-
-
 
         colIdx = mDetailCursor.getColumnIndex("original_title");
         collapsingToolbarLayout.setTitle(mDetailCursor.getString(colIdx));
@@ -420,9 +379,6 @@ public class MovieDetailFragment extends Fragment
         colIdx = mDetailCursor.getColumnIndex("movieId");
         GetTrailers(mDetailCursor.getString(colIdx));
         GetReviews(mDetailCursor.getString(colIdx));
-
-
-
     }
 
     // reset CursorAdapter on Loader Reset

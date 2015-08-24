@@ -42,58 +42,43 @@ public class PopularMovieListFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int MOVIE_LOADER = 0;
-    //gridView holds the id defined in fragment_main.xml
     private GridView gridView;
-    //ImageAdapter imageAdapter;
     private SharedPreferences sharedPrefs;
     static final String MOVIES_BASE_URL = "http://api.themoviedb.org/3";
     protected final String TAG = getClass().getSimpleName();
     protected GetMovieDataApi service;
     final String SORT_PARAM = "sort_by";
     final String API_KEY = "api_key";
-    SharedPreferences.OnSharedPreferenceChangeListener listener;
     Results res;
     private MovieAdapter mMovieAdapter;
     private String sortBy = "";
     private Uri mUri;
-    private String mUriId;
 
     public PopularMovieListFragment() {
 
     }
 
 
-
-    // since we read the location when we create the loader, all we need to do is restart things
     void onSettingsChanged( ) {
         sortBy = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
         if(sortBy.equals(getString(R.string.pref_sortby_favorite))){
 
             mUri = FavMovieEntry.CONTENT_URI;
-            mUriId = FavMovieEntry._ID;
         }
         else {
             if (sortBy.equals(getString(R.string.pref_sortby_default))) {
                 mUri = MoviePopularityEntry.CONTENT_URI;
-                mUriId = MoviePopularityEntry._ID;
             } else {
                 mUri = MovieVoteAverageEntry.CONTENT_URI;
-                mUriId = MovieVoteAverageEntry._ID;
             }
-
             updateMovieList();
         }
         Log.d(TAG, "mUri in SettingsChanged function : " + mUri);
-
         getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
     }
 
 
-
-
-
     private void updateMovieList() {
-        //Log.v(TAG, "updateMovieList() called");
 
         String api_key = "2fc475941d44b7da433d1f18e24e2551";
         //String api_key = ; /*Please use your own api_key for moviedb*/
@@ -122,7 +107,6 @@ public class PopularMovieListFragment extends Fragment
                         cVVector.add(movieValues);
 
                         mUri = MoviePopularityEntry.CONTENT_URI;
-                        mUriId = MoviePopularityEntry._ID;
 
                     }
 
@@ -142,9 +126,7 @@ public class PopularMovieListFragment extends Fragment
 
                         cVVector.add(movieValues);
                         mUri = MovieVoteAverageEntry.CONTENT_URI;
-                        mUriId = MovieVoteAverageEntry._ID;
                     }
-
                 }
 
                 int inserted = 0;
@@ -182,7 +164,6 @@ public class PopularMovieListFragment extends Fragment
         mMovieAdapter = new MovieAdapter(getActivity(), null, 0, MOVIE_LOADER);
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         gridView = (GridView) rootView.findViewById(R.id.gridview);
-        //gridView.setAdapter(mMovieAdapter);
 
         if (savedInstanceState != null) {
             res = savedInstanceState.getParcelable("KEY_RESULTS_LIST");
@@ -190,22 +171,18 @@ public class PopularMovieListFragment extends Fragment
 //            gridView.setAdapter(imageAdapter);  // divya
         }
 
-        // Log.v(TAG,"onCreateView()");
 
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         sortBy = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
         if(sortBy.equals(getString(R.string.pref_sortby_favorite))){
 
             mUri = FavMovieEntry.CONTENT_URI;
-            mUriId = FavMovieEntry._ID;
         }
         else {
             if (sortBy.equals(getString(R.string.pref_sortby_default))) {
                 mUri = MoviePopularityEntry.CONTENT_URI;
-                mUriId = MoviePopularityEntry._ID;
             } else {
                 mUri = MovieVoteAverageEntry.CONTENT_URI;
-                mUriId = MovieVoteAverageEntry._ID;
             }
             service = ApiClient.MovieDataApiInterface();
             updateMovieList();

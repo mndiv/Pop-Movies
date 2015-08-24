@@ -39,11 +39,8 @@ public class MovieProvider extends ContentProvider {
                         "." + MovieContract.MoviePopularityEntry.COLUMN_MOVIE_FAV +
                         " = " + MovieContract.MovieVoteAverageEntry.TABLE_NAME +
                         "." + MovieContract.MovieVoteAverageEntry.COLUMN_MOVIE_FAV);
-
-              //  MovieContract.MoviePopularityEntry.TABLE_NAME);
     }
 
-    //location.location_setting = ?
     private static final String sFavSelection = MovieContract.MoviePopularityEntry.TABLE_NAME+
                 "." + MovieContract.MoviePopularityEntry.COLUMN_MOVIE_FAV + " = ? ";
 
@@ -78,7 +75,6 @@ public class MovieProvider extends ContentProvider {
         matcher.addURI(authority, MovieContract.PATH_VOTE + "/#", VOTE_WITH_ID); //path followed by a number
         matcher.addURI(authority, MovieContract.PATH_FAV, FAV_MOVIES);
         matcher.addURI(authority, MovieContract.PATH_FAV + "/#", FAV_WITH_ID); //path followed by a number
-        //matcher.addURI(authority, MovieContract.PATH_POPULARITY + "/*", FAV_MOVIES); //path followed by a string
         return matcher;
     }
 
@@ -322,29 +318,29 @@ public class MovieProvider extends ContentProvider {
 
         switch (match) {
             case POPULAR:
-                //normalizeDate(values);
+
                 rowsUpdated = db.update(MovieContract.MoviePopularityEntry.TABLE_NAME, values, selection,
                         selectionArgs);
                 break;
             case VOTE:
-                //normalizeDate(values);
+
                 rowsUpdated = db.update(MovieContract.MovieVoteAverageEntry.TABLE_NAME, values, selection,
                         selectionArgs);
                 break;
             case FAV_MOVIES:
-                //normalizeDate(values);
+
                 rowsUpdated = db.update(MovieContract.FavMovieEntry.TABLE_NAME, values, selection,
                         selectionArgs);
                 break;
             case POPULAR_WITH_ID:
-                //normalizeDate(values);
+
                 rowsUpdated = db.update(MovieContract.MoviePopularityEntry.TABLE_NAME,
                         values,
                         MovieContract.MoviePopularityEntry._ID + " = ?",
                         new String[]{String.valueOf(ContentUris.parseId(uri))});
                 break;
             case VOTE_WITH_ID:
-                //normalizeDate(values);
+
                 rowsUpdated = db.update(MovieContract.MovieVoteAverageEntry.TABLE_NAME,
                         values,
                         MovieContract.MovieVoteAverageEntry._ID + " = ?",
@@ -369,7 +365,7 @@ public class MovieProvider extends ContentProvider {
                 int returnCount = 0;
                 try {
                     for (ContentValues value : values) {
-                        //normalizeDate(value);
+
                         long _id = db.insert(MovieContract.MoviePopularityEntry.TABLE_NAME, null, value);
                         if (_id != -1) {
                             returnCount++;
@@ -387,7 +383,6 @@ public class MovieProvider extends ContentProvider {
                 int returnCount = 0;
                 try {
                     for (ContentValues value : values) {
-                        //normalizeDate(value);
                         long _id = db.insert(MovieContract.MovieVoteAverageEntry.TABLE_NAME, null, value);
                         if (_id != -1) {
                             returnCount++;
