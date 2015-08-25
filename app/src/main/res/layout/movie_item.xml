@@ -4,5 +4,6 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/movie_image"/>
+        android:id="@+id/movie_image"
+        android:background="@drawable/touch_selector"/>
 </FrameLayout>

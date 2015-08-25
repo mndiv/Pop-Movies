@@ -76,7 +76,7 @@ public class PopularMovieListFragment extends Fragment
             } else {
                 mUri = MovieVoteAverageEntry.CONTENT_URI;
             }
-            updateMovieList();
+           // updateMovieList();
         }
         Log.d(TAG, "mUri in SettingsChanged function : " + mUri);
         getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
