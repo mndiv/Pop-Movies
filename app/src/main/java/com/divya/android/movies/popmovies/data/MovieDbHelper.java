@@ -24,7 +24,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         final String SQL_CREATE_POPULARITY_TABLE= "CREATE TABLE " + MoviePopularityEntry.TABLE_NAME + " (" +
-                MoviePopularityEntry._ID + " INTEGER PRIMARY KEY," +
+                MoviePopularityEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT ," +
                 MoviePopularityEntry.COLUMN_MOVIE_TITLE + " TEXT NOT NULL, " +
                 MoviePopularityEntry.COLUMN_MOVIE_BACKDROPPATH + " TEXT , " +
                 MoviePopularityEntry.COLUMN_MOVIE_POSTERPATH + " TEXT , " +
@@ -38,7 +38,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
         Log.d(DATABASE_NAME, "Create popularity table statement : " + SQL_CREATE_POPULARITY_TABLE);
 
         final String SQL_CREATE_VOTE_TABLE= "CREATE TABLE " + MovieVoteAverageEntry.TABLE_NAME + " (" +
-                MovieVoteAverageEntry._ID + " INTEGER PRIMARY KEY," +
+                MovieVoteAverageEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT ," +
                 MovieVoteAverageEntry.COLUMN_MOVIE_TITLE + " TEXT NOT NULL, " +
                 MovieVoteAverageEntry.COLUMN_MOVIE_BACKDROPPATH + " TEXT , " +
                 MovieVoteAverageEntry.COLUMN_MOVIE_POSTERPATH + " TEXT , " +
@@ -52,7 +52,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
         Log.d(DATABASE_NAME, "Create vote table statement : " + SQL_CREATE_VOTE_TABLE);
 
         final String SQL_CREATE_FAV_TABLE= "CREATE TABLE " + FavMovieEntry.TABLE_NAME + " (" +
-                FavMovieEntry._ID + " INTEGER PRIMARY KEY," +
+                FavMovieEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT ," +
                 FavMovieEntry.COLUMN_MOVIE_TITLE + " TEXT NOT NULL, " +
                 FavMovieEntry.COLUMN_MOVIE_BACKDROPPATH + " TEXT , " +
                 FavMovieEntry.COLUMN_MOVIE_POSTERPATH + " TEXT , " +

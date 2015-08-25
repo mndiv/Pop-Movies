@@ -41,7 +41,9 @@
 
         <provider
             android:name=".data.MovieProvider"
-            android:authorities="com.divya.android.movies.popmovies">
+            android:authorities="com.divya.android.movies.popmovies"
+            android:enabled="true"
+            android:exported="false">
         </provider>
     </application>
 

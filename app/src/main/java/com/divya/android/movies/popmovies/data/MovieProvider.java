@@ -272,8 +272,8 @@ public class MovieProvider extends ContentProvider {
             case FAV_MOVIES:
                 rowsDeleted = db.delete(
                         MovieContract.FavMovieEntry.TABLE_NAME, selection, selectionArgs);
-                //db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" +
-                  //  MovieContract.FavMovieEntry.TABLE_NAME + "'");
+                db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" +
+                    MovieContract.FavMovieEntry.TABLE_NAME + "'");
                 break;
 
             case POPULAR_WITH_ID:
@@ -290,7 +290,7 @@ public class MovieProvider extends ContentProvider {
                         MovieContract.MovieVoteAverageEntry._ID + " = ?",
                         new String[]{String.valueOf(ContentUris.parseId(uri))});
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" +
-                        MovieContract.MovieVoteAverageEntry.TABLE_NAME + "'");
+                    MovieContract.MovieVoteAverageEntry.TABLE_NAME + "'");
                 break;
             case FAV_WITH_ID:
                 rowsDeleted = db.delete(
@@ -304,7 +304,7 @@ public class MovieProvider extends ContentProvider {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
         // Because a null deletes all rows
-        if (rowsDeleted != 0) {
+            if (rowsDeleted != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
         return rowsDeleted;

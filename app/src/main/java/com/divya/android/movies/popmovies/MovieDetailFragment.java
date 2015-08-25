@@ -2,6 +2,7 @@ package com.divya.android.movies.popmovies;
 
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -66,6 +67,7 @@ public class MovieDetailFragment extends Fragment
     private static final int DETAIL_LOADER = 0;
     Intent intent;
     String sortBy;
+    Cursor movieCursor;
 
 
     private String mPosterPath;
@@ -313,11 +315,25 @@ public class MovieDetailFragment extends Fragment
         return movieLocationId;
     }
 
+
     int  removeMovieFav() {
-        return (getActivity().getContentResolver().delete(
-                MovieContract.FavMovieEntry.CONTENT_URI,
+
+
+        int rowsDeleted =  (getActivity().getContentResolver().delete(
+                        MovieContract.FavMovieEntry.CONTENT_URI,
                 MovieContract.FavMovieEntry.COLUMN_MOVIE_ID + " = ?",
                 new String[]{movieDetailCursor.getString(movieDetailCursor.getColumnIndex("movieId"))}));
+
+        Log.d(TAG, "rowsDeleted = " + rowsDeleted);
+
+
+        return rowsDeleted;
+    }
+
+    public static void updateData2DB(Context context, ContentValues values, int rowId) {
+        Uri uri;
+        uri = ContentUris.withAppendedId(MovieContract.FavMovieEntry.CONTENT_URI, rowId);
+        context.getContentResolver().update(uri, values, null, null);
     }
 
 
@@ -330,7 +346,7 @@ public class MovieDetailFragment extends Fragment
         movieDetailCursor = mDetailCursor;
 
         final String id = mDetailCursor.getString(mDetailCursor.getColumnIndex("movieId"));
-        Cursor movieCursor = getActivity().getContentResolver().query(
+        movieCursor = getActivity().getContentResolver().query(
                 MovieContract.FavMovieEntry.CONTENT_URI,
                 new String[]{MovieContract.FavMovieEntry._ID},
                 MovieContract.FavMovieEntry.COLUMN_MOVIE_ID + " = ?",

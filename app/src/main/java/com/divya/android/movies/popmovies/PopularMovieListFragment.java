@@ -22,6 +22,7 @@ import android.widget.GridView;
 
 import com.divya.android.movies.popmovies.api.ApiClient;
 import com.divya.android.movies.popmovies.api.GetMovieDataApi;
+import com.divya.android.movies.popmovies.data.MovieContract;
 import com.divya.android.movies.popmovies.data.MovieContract.FavMovieEntry;
 import com.divya.android.movies.popmovies.data.MovieContract.MoviePopularityEntry;
 import com.divya.android.movies.popmovies.data.MovieContract.MovieVoteAverageEntry;
@@ -195,10 +196,24 @@ public class PopularMovieListFragment extends Fragment
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // increment the position to match Database Ids indexed starting at 1
-               int uriId = position + 1;
+                int uriId = position + 1;
                 Uri uri;
                 // append Id to uri
-                uri = ContentUris.withAppendedId(mUri,uriId);
+                if (sortBy.equals(getString(R.string.pref_sortby_favorite))) {
+                    Cursor movieCursor = getActivity().getContentResolver().query(
+                            MovieContract.FavMovieEntry.CONTENT_URI,
+                            null,
+                            null,
+                            null,
+                            null);
+
+                    movieCursor.moveToPosition(position);
+
+                    int idFav = movieCursor.getInt(movieCursor.getColumnIndex(FavMovieEntry._ID));
+                    uri = ContentUris.withAppendedId(mUri,idFav);
+
+                } else
+                    uri = ContentUris.withAppendedId(mUri, uriId);
 
                 Intent intent = new Intent(getActivity(), MovieDetail.class);
                 UriData obj = new UriData(uriId, uri);
