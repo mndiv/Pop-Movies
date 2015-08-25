@@ -4,7 +4,6 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -18,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ListView;
 
 import com.divya.android.movies.popmovies.api.ApiClient;
 import com.divya.android.movies.popmovies.api.GetMovieDataApi;
@@ -41,6 +41,8 @@ public class PopularMovieListFragment extends Fragment
 
     private static final int MOVIE_LOADER = 0;
     private GridView gridView;
+    private int mPosition = GridView.INVALID_POSITION;
+    private static final String SELECTED_KEY = "selected_position";
     private SharedPreferences sharedPrefs;
     static final String MOVIES_BASE_URL = "http://api.themoviedb.org/3";
     protected final String TAG = getClass().getSimpleName();
@@ -170,10 +172,10 @@ public class PopularMovieListFragment extends Fragment
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         gridView = (GridView) rootView.findViewById(R.id.gridview);
 
-        if (savedInstanceState != null) {
-            res = savedInstanceState.getParcelable("KEY_RESULTS_LIST");
-//            imageAdapter = new ImageAdapter(getActivity(), res);
-//            gridView.setAdapter(imageAdapter);  // divya
+        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
+            // The gridview probably hasn't even been populated yet.  Actually perform the
+            // swapout in onLoadFinished.
+            mPosition = savedInstanceState.getInt(SELECTED_KEY);
         }
 
 
@@ -211,16 +213,20 @@ public class PopularMovieListFragment extends Fragment
                     ((CallbackFrag) getActivity())
                             .onItemSelected(ContentUris.withAppendedId(mUri, uriId));
                 }
-
+                mPosition = position;
 
             }
         });
         return rootView;
     }
 
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelable("KEY_RESULTS_LIST", res);
+        //outState.putParcelable("KEY_RESULTS_LIST", res);
+        if (mPosition != GridView.INVALID_POSITION) {
+            outState.putInt(SELECTED_KEY, mPosition);
+        }
         super.onSaveInstanceState(outState);
     }
 
@@ -239,10 +245,12 @@ public class PopularMovieListFragment extends Fragment
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-        data.moveToFirst();
-        DatabaseUtils.dumpCursor(data);
         mMovieAdapter.swapCursor(data);
-
+        if (mPosition != ListView.INVALID_POSITION) {
+            // If we don't need to restart the loader, and there's a desired position to restore
+            // to, do so now.
+            gridView.smoothScrollToPosition(mPosition);
+        }
 
     }
 
