@@ -8,6 +8,9 @@
     <string name="trailers">Trailers:</string>
     <string name="trailer1">Trailer1</string>
     <string name="trailer2">Trailer2</string>
+
+    <string name="action_share">Share</string>
+    
     <string name="pref_sortby_key">sort</string>
     <string name="pref_sortby_label">Sort by</string>
     <string name="pref_sortby_default">popularity.desc</string>

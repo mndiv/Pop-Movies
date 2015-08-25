@@ -16,12 +16,17 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -66,6 +71,9 @@ public class MovieDetailFragment extends Fragment
     Intent intent;
     String sortBy;
     Cursor movieCursor;
+    private ShareActionProvider mShareActionProvider;
+    private String mMovieTitle;
+    private static final String FORECAST_SHARE_HASHTAG = " #PopularMoveApp";
 
 
     private String mPosterPath;
@@ -79,6 +87,31 @@ public class MovieDetailFragment extends Fragment
     private SharedPreferences sharedPrefs;
 
     public MovieDetailFragment() {
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        inflater.inflate(R.menu.detailfragment, menu);
+
+        // Retrieve the share menu item
+        MenuItem menuItem = menu.findItem(R.id.action_share);
+
+        // Get the provider and hold onto it to set/change the share intent.
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+
+        // If onLoadFinished happens before this, we can go ahead and set the share intent now.
+        if (mMovieTitle != null) {
+            mShareActionProvider.setShareIntent(createShareForecastIntent());
+        }
+    }
+    private Intent createShareForecastIntent() {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, mMovieTitle + FORECAST_SHARE_HASHTAG);
+        return shareIntent;
     }
 
     @Override
@@ -411,6 +444,15 @@ public class MovieDetailFragment extends Fragment
         colIdx = mDetailCursor.getColumnIndex("movieId");
         GetTrailers(mDetailCursor.getString(colIdx));
         GetReviews(mDetailCursor.getString(colIdx));
+
+        // We still need this for the share intent
+        mMovieTitle = String.format("%s \n\n\n\n\n %s", mDetailCursor.getString(mDetailCursor.getColumnIndex("original_title")),
+                mDetailCursor.getString(mDetailCursor.getColumnIndex("overview")));
+
+        // If onCreateOptionsMenu has already happened, we need to update the share intent now.
+        if (mShareActionProvider != null) {
+            mShareActionProvider.setShareIntent(createShareForecastIntent());
+        }
     }
 
     // reset CursorAdapter on Loader Reset
