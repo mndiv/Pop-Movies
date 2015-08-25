@@ -2,7 +2,6 @@ package com.divya.android.movies.popmovies;
 
 import android.content.ContentUris;
 import android.content.ContentValues;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
@@ -22,12 +21,10 @@ import android.widget.GridView;
 
 import com.divya.android.movies.popmovies.api.ApiClient;
 import com.divya.android.movies.popmovies.api.GetMovieDataApi;
-import com.divya.android.movies.popmovies.data.MovieContract;
 import com.divya.android.movies.popmovies.data.MovieContract.FavMovieEntry;
 import com.divya.android.movies.popmovies.data.MovieContract.MoviePopularityEntry;
 import com.divya.android.movies.popmovies.data.MovieContract.MovieVoteAverageEntry;
 import com.divya.android.movies.popmovies.model.Results;
-import com.divya.android.movies.popmovies.model.UriData;
 
 import java.util.Vector;
 
@@ -59,6 +56,18 @@ public class PopularMovieListFragment extends Fragment
 
     }
 
+
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of item
+     * selections.
+     */
+    public interface CallbackFrag {
+        /**
+         * DetailFragmentCallback for when an item has been selected.
+         */
+        public void onItemSelected(Uri movieUri);
+    }
 
     void onSettingsChanged( ) {
         sortBy = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
@@ -194,9 +203,11 @@ public class PopularMovieListFragment extends Fragment
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 // increment the position to match Database Ids indexed starting at 1
-                int uriId = position + 1;
+                int uriId;
+                Uri  uri;
+              /*  int uriId = position + 1;
                 Uri uri;
                 // append Id to uri
                 if (sortBy.equals(getString(R.string.pref_sortby_favorite))) {
@@ -219,6 +230,23 @@ public class PopularMovieListFragment extends Fragment
                 UriData obj = new UriData(uriId, uri);
                 intent.putExtra("MovieInfo", obj);
                 startActivity(intent);
+                */
+                // CursorAdapter returns a cursor at the correct position for getItem(), or null
+                // if it cannot seek to that position.
+                Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
+                if (cursor != null) {
+                    if (sortBy.equals(getString(R.string.pref_sortby_favorite)))
+                    {
+                        uriId = cursor.getInt(cursor.getColumnIndex(FavMovieEntry._ID));
+                    }
+                    else
+                        uriId = position + 1;
+
+                    ((CallbackFrag) getActivity())
+                            .onItemSelected(ContentUris.withAppendedId(mUri,uriId));
+                }
+                //mPosition = position;
+
 
             }
         });

@@ -34,7 +34,6 @@ import com.divya.android.movies.popmovies.api.GetMovieDataApi;
 import com.divya.android.movies.popmovies.data.MovieContract;
 import com.divya.android.movies.popmovies.model.ResultReviews;
 import com.divya.android.movies.popmovies.model.ResultVideos;
-import com.divya.android.movies.popmovies.model.UriData;
 import com.squareup.picasso.Picasso;
 
 import retrofit.Callback;
@@ -49,6 +48,7 @@ public class MovieDetailFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Cursor>{
 
     static final String MOVIES_BASE_URL = "http://api.themoviedb.org/3";
+    static final String DETAIL_URI = "URI";
     protected final String TAG = getClass().getSimpleName();
     Toolbar toolbar;
     CollapsingToolbarLayout collapsingToolbarLayout;
@@ -68,6 +68,7 @@ public class MovieDetailFragment extends Fragment
     Intent intent;
     String sortBy;
     Cursor movieCursor;
+    private SharedPreferences sharedPrefs;
 
 
     private String mPosterPath;
@@ -87,6 +88,24 @@ public class MovieDetailFragment extends Fragment
         super.onActivityCreated(savedInstanceState);
     }
 
+
+
+    void onSettingsChanged( ) {
+        sortBy = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
+        if(sortBy.equals(getString(R.string.pref_sortby_favorite))){
+
+            mUri = MovieContract.FavMovieEntry.CONTENT_URI;
+        }
+        else {
+            if (sortBy.equals(getString(R.string.pref_sortby_default))) {
+                mUri = MovieContract.MoviePopularityEntry.CONTENT_URI;
+            } else {
+                mUri = MovieContract.MovieVoteAverageEntry.CONTENT_URI;
+            }
+        }
+        Log.d(TAG, "mUri in SettingsChanged function : " + mUri);
+        getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
+    }
 
 
     public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TrailerViewHolder> {
@@ -212,12 +231,19 @@ public class MovieDetailFragment extends Fragment
         toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
 
-        intent = getActivity().getIntent();
+//        intent = getActivity().getIntent();
+//
+//        Bundle data = intent.getExtras();
+//        UriData uriObj = data.getParcelable("MovieInfo");
+//        mUri = uriObj.getUri();
 
-        Bundle data = intent.getExtras();
-        UriData uriObj = data.getParcelable("MovieInfo");
-        mUri = uriObj.getUri();
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            mUri = arguments.getParcelable(MovieDetailFragment.DETAIL_URI);
+        }
 
+
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         backdropView = (ImageView)rootView.findViewById(R.id.backdrop_view);
         posterView = (ImageView) rootView.findViewById(R.id.posterPath);
@@ -265,17 +291,24 @@ public class MovieDetailFragment extends Fragment
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args){
+
+
         String selection = null;
         String[] selectionArgs = null;
 
 
+
         Log.d(TAG, "mUri in DetailFragment :" + mUri);
-        return new CursorLoader(getActivity(),
-                mUri,
-                null,
-                selection,
-                selectionArgs,
-                null);
+        if(null != mUri) {
+            return new CursorLoader(getActivity(),
+                    mUri,
+                    null,
+                    selection,
+                    selectionArgs,
+                    null);
+
+        }
+        return null;
     }
 
     @Override
