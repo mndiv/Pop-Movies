@@ -2,7 +2,6 @@ package com.divya.android.movies.popmovies;
 
 import android.content.ContentUris;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -34,7 +33,6 @@ import com.divya.android.movies.popmovies.api.GetMovieDataApi;
 import com.divya.android.movies.popmovies.data.MovieContract;
 import com.divya.android.movies.popmovies.model.ResultReviews;
 import com.divya.android.movies.popmovies.model.ResultVideos;
-import com.divya.android.movies.popmovies.model.UriData;
 import com.squareup.picasso.Picasso;
 
 import retrofit.Callback;
@@ -77,6 +75,8 @@ public class MovieDetailFragment extends Fragment
     //String api_key = ; /*Please use your own api_key for moviedb*/
     private Cursor movieDetailCursor;
     private Cursor mDetailCursor;
+    static final String DETAIL_URI = "URI";
+    private SharedPreferences sharedPrefs;
 
     public MovieDetailFragment() {
     }
@@ -87,7 +87,21 @@ public class MovieDetailFragment extends Fragment
         super.onActivityCreated(savedInstanceState);
     }
 
+    void onSettingsChanged() {
+        sortBy = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
+        if (sortBy.equals(getString(R.string.pref_sortby_favorite))) {
 
+            mUri = MovieContract.FavMovieEntry.CONTENT_URI;
+        } else {
+            if (sortBy.equals(getString(R.string.pref_sortby_default))) {
+                mUri = MovieContract.MoviePopularityEntry.CONTENT_URI;
+            } else {
+                mUri = MovieContract.MovieVoteAverageEntry.CONTENT_URI;
+            }
+        }
+        Log.d(TAG, "mUri in SettingsChanged function : "+ mUri);
+        getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
+    }
 
     public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TrailerViewHolder> {
         ResultVideos trailers;
@@ -212,11 +226,14 @@ public class MovieDetailFragment extends Fragment
         toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
 
-        intent = getActivity().getIntent();
 
-        Bundle data = intent.getExtras();
-        UriData uriObj = data.getParcelable("MovieInfo");
-        mUri = uriObj.getUri();
+
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            mUri = arguments.getParcelable(MovieDetailFragment.DETAIL_URI);
+        }
+
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
 
         backdropView = (ImageView)rootView.findViewById(R.id.backdrop_view);
@@ -234,6 +251,7 @@ public class MovieDetailFragment extends Fragment
         fabBtn = (FloatingActionButton) rootView.findViewById(R.id.fabBtn);
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         sortBy = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
+
 
         if(sortBy.equals("favorite")){
             fabBtn.setVisibility(View.VISIBLE);
@@ -264,18 +282,21 @@ public class MovieDetailFragment extends Fragment
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args){
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String selection = null;
         String[] selectionArgs = null;
 
 
         Log.d(TAG, "mUri in DetailFragment :" + mUri);
-        return new CursorLoader(getActivity(),
-                mUri,
-                null,
-                selection,
-                selectionArgs,
-                null);
+        if (null != mUri) {
+            return new CursorLoader(getActivity(),
+                    mUri,
+                    null,
+                    selection,
+                    selectionArgs,
+                    null);
+        }
+        return null;
     }
 
     @Override
@@ -330,12 +351,6 @@ public class MovieDetailFragment extends Fragment
         return rowsDeleted;
     }
 
-    public static void updateData2DB(Context context, ContentValues values, int rowId) {
-        Uri uri;
-        uri = ContentUris.withAppendedId(MovieContract.FavMovieEntry.CONTENT_URI, rowId);
-        context.getContentResolver().update(uri, values, null, null);
-    }
-
 
     // Set the cursor in our CursorAdapter once the Cursor is loaded
     @Override
@@ -344,6 +359,7 @@ public class MovieDetailFragment extends Fragment
         mDetailCursor.moveToFirst();
         DatabaseUtils.dumpCursor(mDetailCursor);
         movieDetailCursor = mDetailCursor;
+
 
         final String id = mDetailCursor.getString(mDetailCursor.getColumnIndex("movieId"));
         movieCursor = getActivity().getContentResolver().query(
