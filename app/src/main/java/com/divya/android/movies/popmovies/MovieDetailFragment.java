@@ -129,7 +129,7 @@ public class MovieDetailFragment extends Fragment
         super.onResume();
     }
 
-    void onSettingsChanged() {
+   /* void onSettingsChanged() {
         sortBy = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
         if (sortBy.equals(getString(R.string.pref_sortby_favorite))) {
 
@@ -143,7 +143,7 @@ public class MovieDetailFragment extends Fragment
         }
         Log.d(TAG, "mUri in SettingsChanged function : " + mUri);
         getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
-    }
+    }*/
 
     public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TrailerViewHolder> {
         ResultVideos trailers;
@@ -276,13 +276,14 @@ public class MovieDetailFragment extends Fragment
         //Initialize Toolbar
         toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+       // initToolbar();
 
 
 
         Bundle arguments = getArguments();
         if (arguments != null) {
             mUri = arguments.getParcelable(MovieDetailFragment.DETAIL_URI);
-           // review = arguments.getString("Reviews");
+
         }
 
 
@@ -322,11 +323,11 @@ public class MovieDetailFragment extends Fragment
                 recList.setAdapter(adapter);
                 Log.d(TAG, "In SavedInstance State recyclerview adapter is called");
             }
-//            if(savedInstanceState.containsKey("Reviews")){
-//                review = savedInstanceState.getString("Reviews");
-//                if (review != "")
-//                    reviews.setText(review);
-//            }
+            if(savedInstanceState.containsKey("Reviews")){
+                review = savedInstanceState.getString("Reviews");
+                if (review != "")
+                    reviews.setText(review);
+            }
         }
 
         if(sortBy.equals("favorite")){
@@ -340,12 +341,16 @@ public class MovieDetailFragment extends Fragment
                 public void onClick(View v) {
                     if (favValue == 0) {
                         fabBtn.setImageResource(R.drawable.ic_star_border_white);
-                        if(removeMovieFav()!=0)
-                            Toast.makeText(getActivity(),"Removed from Favorites", Toast.LENGTH_SHORT).show();
+                        if(removeMovieFav()!=0) {
+                            Toast.makeText(getActivity(), "Removed from Favorites", Toast.LENGTH_SHORT).show();
+                            favValue = 1;
+                        }
                     } else {
                         fabBtn.setImageResource(R.drawable.ic_star_white);
-                        if(addMovieFav()!=0)
-                         Toast.makeText(getActivity(),"Added to Favorites", Toast.LENGTH_SHORT).show();
+                        if(addMovieFav()!=0) {
+                            Toast.makeText(getActivity(), "Added to Favorites", Toast.LENGTH_SHORT).show();
+                            favValue = 0;
+                        }
 
                     }
 
@@ -509,8 +514,8 @@ public class MovieDetailFragment extends Fragment
     }
 
 
-   /* private void initToolbar() {
+    private void initToolbar() {
         toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-    }*/
+    }
 }

@@ -6,10 +6,9 @@
         <item name="colorPrimaryDark">#1565C0</item>
         <item name="colorAccent">#E91E63</item>
     </style>
-    <style name="AppTheme.WithoutActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
+
+
+    <style name="DetailsTheme" parent="Theme.AppCompat.Light.NoActionBar"></style>
     <style name="Toolbar.ExpandedTitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">20sp</item>
     </style>
