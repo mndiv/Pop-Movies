@@ -74,6 +74,7 @@ public class MovieDetailFragment extends Fragment
     private ShareActionProvider mShareActionProvider;
     private String mMovieTitle;
     private static final String FORECAST_SHARE_HASHTAG = " #PopularMoveApp";
+    private String review = "";
 
 
     private String mPosterPath;
@@ -85,6 +86,7 @@ public class MovieDetailFragment extends Fragment
     private Cursor mDetailCursor;
     static final String DETAIL_URI = "URI";
     private SharedPreferences sharedPrefs;
+    private ResultVideos videoTrailers;
 
     public MovieDetailFragment() {
         setHasOptionsMenu(true);
@@ -114,10 +116,17 @@ public class MovieDetailFragment extends Fragment
         return shareIntent;
     }
 
+//    @Override
+//    public void onActivityCreated(Bundle savedInstanceState) {
+//        getLoaderManager().initLoader(DETAIL_LOADER, null, this);
+//        super.onActivityCreated(savedInstanceState);
+//    }
+
+
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
+    public void onResume() {
         getLoaderManager().initLoader(DETAIL_LOADER, null, this);
-        super.onActivityCreated(savedInstanceState);
+        super.onResume();
     }
 
     void onSettingsChanged() {
@@ -132,7 +141,7 @@ public class MovieDetailFragment extends Fragment
                 mUri = MovieContract.MovieVoteAverageEntry.CONTENT_URI;
             }
         }
-        Log.d(TAG, "mUri in SettingsChanged function : "+ mUri);
+        Log.d(TAG, "mUri in SettingsChanged function : " + mUri);
         getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
     }
 
@@ -209,9 +218,10 @@ public class MovieDetailFragment extends Fragment
                     recList.setVisibility(View.VISIBLE);
                     emptyView.setVisibility(View.GONE);
                 }
-
+                videoTrailers = resultVideos;
                 RVAdapter adapter = new RVAdapter(resultVideos);
                 recList.setAdapter(adapter);
+                Log.d(TAG, "recyclerview adapter is called");
             }
 
             @Override
@@ -219,6 +229,13 @@ public class MovieDetailFragment extends Fragment
                 Log.d(TAG, "failure: " + error);
             }
         });
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable("Trailers", videoTrailers);
+        outState.putString("Reviews",review);
+        super.onSaveInstanceState(outState);
     }
 
     public void GetReviews(final String id) {
@@ -229,7 +246,7 @@ public class MovieDetailFragment extends Fragment
         reviewService.getMovieReviewsFromApi(videoId, api_key, new Callback<ResultReviews>() {
             @Override
             public void success(ResultReviews resultReviews, Response response) {
-                String review = "";
+                review = "";
                 for (int i = 0; i < resultReviews.getResults().size(); i++) {
 
                     Log.d(TAG, "author:" + resultReviews.getResults().get(i).getAuthor());
@@ -238,6 +255,7 @@ public class MovieDetailFragment extends Fragment
                     review += resultReviews.getResults().get(i).getAuthor() + "\n\n" +
                             resultReviews.getResults().get(i).getContent() + "\n\n\n\n";
                 }
+
                 if (review != "")
                     reviews.setText(review);
             }
@@ -264,7 +282,9 @@ public class MovieDetailFragment extends Fragment
         Bundle arguments = getArguments();
         if (arguments != null) {
             mUri = arguments.getParcelable(MovieDetailFragment.DETAIL_URI);
+           // review = arguments.getString("Reviews");
         }
+
 
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
@@ -285,6 +305,29 @@ public class MovieDetailFragment extends Fragment
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         sortBy = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
 
+        if(savedInstanceState != null)
+        {
+            if(savedInstanceState.containsKey("Trailers")) {
+
+                videoTrailers = savedInstanceState.getParcelable("Trailers");
+
+                if (videoTrailers.getResults().size() == 0) {
+                    recList.setVisibility(View.GONE);
+                    emptyView.setVisibility(View.VISIBLE);
+                } else {
+                    recList.setVisibility(View.VISIBLE);
+                    emptyView.setVisibility(View.GONE);
+                }
+                RVAdapter adapter = new RVAdapter(videoTrailers);
+                recList.setAdapter(adapter);
+                Log.d(TAG, "In SavedInstance State recyclerview adapter is called");
+            }
+//            if(savedInstanceState.containsKey("Reviews")){
+//                review = savedInstanceState.getString("Reviews");
+//                if (review != "")
+//                    reviews.setText(review);
+//            }
+        }
 
         if(sortBy.equals("favorite")){
             fabBtn.setVisibility(View.VISIBLE);
@@ -444,6 +487,9 @@ public class MovieDetailFragment extends Fragment
         colIdx = mDetailCursor.getColumnIndex("movieId");
         GetTrailers(mDetailCursor.getString(colIdx));
         GetReviews(mDetailCursor.getString(colIdx));
+
+//        if (review != "")
+//            reviews.setText(review);
 
         // We still need this for the share intent
         mMovieTitle = String.format("%s \n\n\n\n\n %s", mDetailCursor.getString(mDetailCursor.getColumnIndex("original_title")),

@@ -8,8 +8,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.facebook.stetho.Stetho;
-
 
 public class MainActivity extends AppCompatActivity implements PopularMovieListFragment.CallbackFrag {
 
@@ -43,13 +41,6 @@ public class MainActivity extends AppCompatActivity implements PopularMovieListF
             mTwoPane = false;
             getSupportActionBar().setElevation(0f);
         }
-        Stetho.initialize(
-                Stetho.newInitializerBuilder(this)
-                        .enableDumpapp(
-                                Stetho.defaultDumperPluginsProvider(this))
-                        .enableWebKitInspector(
-                                Stetho.defaultInspectorModulesProvider(this))
-                        .build());
     }
 
 

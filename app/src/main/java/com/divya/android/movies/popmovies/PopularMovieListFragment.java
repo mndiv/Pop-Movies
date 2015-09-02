@@ -53,6 +53,7 @@ public class PopularMovieListFragment extends Fragment
     private MovieAdapter mMovieAdapter;
     private String sortBy = "";
     private Uri mUri;
+    String review;
 
     public PopularMovieListFragment() {
 
@@ -63,7 +64,7 @@ public class PopularMovieListFragment extends Fragment
         /**
          * DetailFragmentCallback for when an item has been selected.
          */
-        public void onItemSelected(Uri movieUri);
+        void onItemSelected(Uri movieUri);
     }
 
     void onSettingsChanged( ) {
@@ -78,7 +79,7 @@ public class PopularMovieListFragment extends Fragment
             } else {
                 mUri = MovieVoteAverageEntry.CONTENT_URI;
             }
-           // updateMovieList();
+            updateMovieList();
         }
         Log.d(TAG, "mUri in SettingsChanged function : " + mUri);
         getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
@@ -210,6 +211,9 @@ public class PopularMovieListFragment extends Fragment
                     } else
                         uriId = position + 1;
 
+                    int colIdx = cursor.getColumnIndex("movieId");
+                    //GetReviews(cursor.getString(colIdx));
+
                     ((CallbackFrag) getActivity())
                             .onItemSelected(ContentUris.withAppendedId(mUri, uriId));
                 }
@@ -253,6 +257,8 @@ public class PopularMovieListFragment extends Fragment
         }
 
     }
+
+
 
     // reset CursorAdapter on Loader Reset
     @Override

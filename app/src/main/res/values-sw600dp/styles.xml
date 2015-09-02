@@ -4,4 +4,9 @@
         <item name="android:choiceMode">singleChoice</item>
     </style>
 
+
+    <style name="AppTheme.WithoutActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
 </resources>
