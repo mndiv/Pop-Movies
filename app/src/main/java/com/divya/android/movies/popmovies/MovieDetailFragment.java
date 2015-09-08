@@ -49,7 +49,7 @@ import retrofit.client.Response;
  * A placeholder fragment containing a simple view.
  */
 public class MovieDetailFragment extends Fragment
-        implements LoaderManager.LoaderCallbacks<Cursor>{
+        implements LoaderManager.LoaderCallbacks<Cursor> {
 
     static final String MOVIES_BASE_URL = "http://api.themoviedb.org/3";
     protected final String TAG = getClass().getSimpleName();
@@ -65,7 +65,10 @@ public class MovieDetailFragment extends Fragment
     private TextView overview;
     RecyclerView recList;
     TextView emptyView;
+    TextView headReviews;
     private int colIdx;
+    View div1;
+    View div2;
     private int favValue;
     private static final int DETAIL_LOADER = 0;
     Intent intent;
@@ -87,6 +90,8 @@ public class MovieDetailFragment extends Fragment
     static final String DETAIL_URI = "URI";
     private SharedPreferences sharedPrefs;
     private ResultVideos videoTrailers;
+    View rootView;
+    private TextView headTrailers;
 
     public MovieDetailFragment() {
         setHasOptionsMenu(true);
@@ -108,6 +113,7 @@ public class MovieDetailFragment extends Fragment
             mShareActionProvider.setShareIntent(createShareForecastIntent());
         }
     }
+
     private Intent createShareForecastIntent() {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
@@ -116,12 +122,6 @@ public class MovieDetailFragment extends Fragment
         return shareIntent;
     }
 
-//    @Override
-//    public void onActivityCreated(Bundle savedInstanceState) {
-//        getLoaderManager().initLoader(DETAIL_LOADER, null, this);
-//        super.onActivityCreated(savedInstanceState);
-//    }
-
 
     @Override
     public void onResume() {
@@ -129,21 +129,6 @@ public class MovieDetailFragment extends Fragment
         super.onResume();
     }
 
-   /* void onSettingsChanged() {
-        sortBy = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
-        if (sortBy.equals(getString(R.string.pref_sortby_favorite))) {
-
-            mUri = MovieContract.FavMovieEntry.CONTENT_URI;
-        } else {
-            if (sortBy.equals(getString(R.string.pref_sortby_default))) {
-                mUri = MovieContract.MoviePopularityEntry.CONTENT_URI;
-            } else {
-                mUri = MovieContract.MovieVoteAverageEntry.CONTENT_URI;
-            }
-        }
-        Log.d(TAG, "mUri in SettingsChanged function : " + mUri);
-        getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
-    }*/
 
     public class RVAdapter extends RecyclerView.Adapter<RVAdapter.TrailerViewHolder> {
         ResultVideos trailers;
@@ -234,7 +219,7 @@ public class MovieDetailFragment extends Fragment
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelable("Trailers", videoTrailers);
-        outState.putString("Reviews",review);
+        outState.putString("Reviews", review);
         super.onSaveInstanceState(outState);
     }
 
@@ -258,6 +243,8 @@ public class MovieDetailFragment extends Fragment
 
                 if (review != "")
                     reviews.setText(review);
+                else
+                    reviews.setText("No Reviews");
             }
 
             @Override
@@ -271,95 +258,95 @@ public class MovieDetailFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_details, container, false);
 
-        //Initialize Toolbar
-        toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-       // initToolbar();
-
-
+        rootView = inflater.inflate(R.layout.fragment_details, container, false);
 
         Bundle arguments = getArguments();
+
+            toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
+            ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+
+
+
         if (arguments != null) {
+
             mUri = arguments.getParcelable(MovieDetailFragment.DETAIL_URI);
-
         }
+            sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
 
-        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            div1 = (View) rootView.findViewById(R.id.divider);
+            div2 = (View) rootView.findViewById(R.id.divider2);
+            backdropView = (ImageView) rootView.findViewById(R.id.backdrop_view);
+            posterView = (ImageView) rootView.findViewById(R.id.posterPath);
+            releaseDate = (TextView) rootView.findViewById(R.id.releaseDate);
+            userRating = (TextView) rootView.findViewById(R.id.userRating);
+            overview = (TextView) rootView.findViewById(R.id.overview);
+            recList = (RecyclerView) rootView.findViewById(R.id.trailersList);
+            emptyView = (TextView) rootView.findViewById(R.id.empty_view);
+            headTrailers =(TextView) rootView.findViewById(R.id.text_trailers);
+            headReviews = (TextView) rootView.findViewById(R.id.text_reviews);
+            reviews = (TextView) rootView.findViewById(R.id.reviews);
 
+            rootLayout = (CoordinatorLayout) rootView.findViewById(R.id.rootLayout);
+            collapsingToolbarLayout = (CollapsingToolbarLayout) rootView.findViewById(R.id.collapsingToolbarLayout);
 
-        backdropView = (ImageView)rootView.findViewById(R.id.backdrop_view);
-        posterView = (ImageView) rootView.findViewById(R.id.posterPath);
-        releaseDate = (TextView) rootView.findViewById(R.id.releaseDate);
-        userRating = (TextView) rootView.findViewById(R.id.userRating);
-        overview = (TextView) rootView.findViewById(R.id.overview);
-        recList = (RecyclerView) rootView.findViewById(R.id.trailersList);
-        emptyView = (TextView) rootView.findViewById(R.id.empty_view);
-        reviews = (TextView) rootView.findViewById(R.id.reviews);
+            fabBtn = (FloatingActionButton) rootView.findViewById(R.id.fabBtn);
+            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            sortBy = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
 
-        rootLayout = (CoordinatorLayout) rootView.findViewById(R.id.rootLayout);
-        collapsingToolbarLayout = (CollapsingToolbarLayout) rootView.findViewById(R.id.collapsingToolbarLayout);
+            if (savedInstanceState != null) {
+                if (savedInstanceState.containsKey("Trailers")) {
 
-        fabBtn = (FloatingActionButton) rootView.findViewById(R.id.fabBtn);
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        sortBy = sharedPrefs.getString(getString(R.string.pref_sortby_key), getString(R.string.pref_sortby_default));
+                    videoTrailers = savedInstanceState.getParcelable("Trailers");
 
-        if(savedInstanceState != null)
-        {
-            if(savedInstanceState.containsKey("Trailers")) {
-
-                videoTrailers = savedInstanceState.getParcelable("Trailers");
-
-                if (videoTrailers.getResults().size() == 0) {
-                    recList.setVisibility(View.GONE);
-                    emptyView.setVisibility(View.VISIBLE);
-                } else {
-                    recList.setVisibility(View.VISIBLE);
-                    emptyView.setVisibility(View.GONE);
-                }
-                RVAdapter adapter = new RVAdapter(videoTrailers);
-                recList.setAdapter(adapter);
-                Log.d(TAG, "In SavedInstance State recyclerview adapter is called");
-            }
-            if(savedInstanceState.containsKey("Reviews")){
-                review = savedInstanceState.getString("Reviews");
-                if (review != "")
-                    reviews.setText(review);
-            }
-        }
-
-        if(sortBy.equals("favorite")){
-            fabBtn.setVisibility(View.VISIBLE);
-        }
-        else {
-
-
-            fabBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (favValue == 0) {
-                        fabBtn.setImageResource(R.drawable.ic_star_border_white);
-                        if(removeMovieFav()!=0) {
-                            Toast.makeText(getActivity(), "Removed from Favorites", Toast.LENGTH_SHORT).show();
-                            favValue = 1;
-                        }
+                    if (videoTrailers.getResults().size() == 0) {
+                        recList.setVisibility(View.GONE);
+                        emptyView.setVisibility(View.VISIBLE);
                     } else {
-                        fabBtn.setImageResource(R.drawable.ic_star_white);
-                        if(addMovieFav()!=0) {
-                            Toast.makeText(getActivity(), "Added to Favorites", Toast.LENGTH_SHORT).show();
-                            favValue = 0;
+                        recList.setVisibility(View.VISIBLE);
+                        emptyView.setVisibility(View.GONE);
+                    }
+                    RVAdapter adapter = new RVAdapter(videoTrailers);
+                    recList.setAdapter(adapter);
+                    Log.d(TAG, "In SavedInstance State recyclerview adapter is called");
+                }
+                if (savedInstanceState.containsKey("Reviews")) {
+                    review = savedInstanceState.getString("Reviews");
+                    if (review != "")
+                        reviews.setText(review);
+                }
+            }
+
+            if (sortBy.equals("favorite")) {
+                fabBtn.setVisibility(View.VISIBLE);
+            } else {
+
+
+                fabBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (favValue == 0) {
+                            fabBtn.setImageResource(R.drawable.ic_star_border_white);
+                            if (removeMovieFav() != 0) {
+                                Toast.makeText(getActivity(), "Removed from Favorites", Toast.LENGTH_SHORT).show();
+                                favValue = 1;
+                            }
+                        } else {
+                            fabBtn.setImageResource(R.drawable.ic_star_white);
+                            if (addMovieFav() != 0) {
+                                Toast.makeText(getActivity(), "Added to Favorites", Toast.LENGTH_SHORT).show();
+                                favValue = 0;
+                            }
+
                         }
 
                     }
-
-                }
-            });
-        }
-
+                });
+            }
 
         return rootView;
+
     }
 
     @Override
@@ -381,7 +368,7 @@ public class MovieDetailFragment extends Fragment
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState){
+    public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
     }
 
@@ -413,16 +400,15 @@ public class MovieDetailFragment extends Fragment
         movieLocationId = ContentUris.parseId(insertedUri);
 
 
-
         return movieLocationId;
     }
 
 
-    int  removeMovieFav() {
+    int removeMovieFav() {
 
 
-        int rowsDeleted =  (getActivity().getContentResolver().delete(
-                        MovieContract.FavMovieEntry.CONTENT_URI,
+        int rowsDeleted = (getActivity().getContentResolver().delete(
+                MovieContract.FavMovieEntry.CONTENT_URI,
                 MovieContract.FavMovieEntry.COLUMN_MOVIE_ID + " = ?",
                 new String[]{movieDetailCursor.getString(movieDetailCursor.getColumnIndex("movieId"))}));
 
@@ -441,6 +427,7 @@ public class MovieDetailFragment extends Fragment
         DatabaseUtils.dumpCursor(mDetailCursor);
         movieDetailCursor = mDetailCursor;
 
+        //initToolbar();
 
         final String id = mDetailCursor.getString(mDetailCursor.getColumnIndex("movieId"));
         movieCursor = getActivity().getContentResolver().query(
@@ -470,7 +457,7 @@ public class MovieDetailFragment extends Fragment
 
 
         //Release Date
-        colIdx = mDetailCursor.getColumnIndex( "release_date");
+        colIdx = mDetailCursor.getColumnIndex("release_date");
         String str = mDetailCursor.getString(colIdx).substring(0, 4);
         releaseDate.setText(str);
 
@@ -489,8 +476,14 @@ public class MovieDetailFragment extends Fragment
         llm.setOrientation(LinearLayoutManager.HORIZONTAL);
         recList.setLayoutManager(llm);
 
+        div1.getLayoutParams().height = 3;
+
         colIdx = mDetailCursor.getColumnIndex("movieId");
         GetTrailers(mDetailCursor.getString(colIdx));
+
+        headTrailers.setText("Trailers");
+        div2.getLayoutParams().height = 3;
+        headReviews.setText("Reviews");
         GetReviews(mDetailCursor.getString(colIdx));
 
 //        if (review != "")
@@ -508,14 +501,14 @@ public class MovieDetailFragment extends Fragment
 
     // reset CursorAdapter on Loader Reset
     @Override
-    public void onLoaderReset(Loader<Cursor> loader){
+    public void onLoaderReset(Loader<Cursor> loader) {
 
         mDetailCursor = null;
     }
 
 
     private void initToolbar() {
-        toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
     }
 }

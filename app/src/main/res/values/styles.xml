@@ -1,14 +1,12 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">#2196F3</item>
         <item name="colorPrimaryDark">#1565C0</item>
         <item name="colorAccent">#E91E63</item>
     </style>
 
-
-    <style name="DetailsTheme" parent="Theme.AppCompat.Light.NoActionBar"></style>
     <style name="Toolbar.ExpandedTitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">20sp</item>
     </style>
@@ -21,7 +19,6 @@
         <!-- Here it's a stub.  In screens of sufficient width, this style includes modifications
         for two-pane layout -->
     </style>
-
 
 
 </resources>

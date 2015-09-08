@@ -5,5 +5,4 @@
         <item name="android:colorPrimary">@color/movie_blue</item>
         <item name="android:colorPrimaryDark">@color/movie_dark_blue</item>
     </style>
-
 </resources>
